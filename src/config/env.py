@@ -22,7 +22,7 @@ class AppDBConfig(DBConfig):
     """
 
     db_host: str = os.getenv("DB_HOST", "localhost:5432")
-    db_name: str = os.getenv("DB_NAME", "e-commerce")
+    db_name: str = os.getenv("DB_NAME", "app-web")
     db_username: str = os.getenv("DB_USERNAME", "postgres")
     db_password: str = os.getenv("DB_PASSWORD", "root")
 

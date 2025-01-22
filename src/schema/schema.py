@@ -18,7 +18,8 @@ class UserModel(Base):
     __table_args__ = DBConfig.BASE_ARGS
 
     id                        = Column(BIGINT, primary_key=True)
-    name                      = Column(VARCHAR(250), nullable=False)
+    first_name                = Column(VARCHAR(100), nullable=False)
+    last_name                 = Column(VARCHAR(100), nullable=False)
     email                     = Column(VARCHAR(100), nullable=False)
     mobile_number             = Column(VARCHAR(100))
     status                    = Column(SMALLINT, nullable=False, default=1)
