@@ -86,7 +86,7 @@ class OrderModel(Base):
 class OrderItemModel(Base):
     """Order Item Model"""
 
-    __tablename__  = DBTables
+    __tablename__  = DBTables.ORDER_ITEMS
     __table_args__ = DBConfig.BASE_ARGS
 
     id                        = Column(BIGINT, primary_key=True)
@@ -139,7 +139,7 @@ Index(DBTables.USER + '_email_key', UserModel.email, unique=False)
 Index(DBTables.USER + '_is_admin_key', UserModel.is_admin, unique=False)
 Index(DBTables.PRODUCTS + "_name_key", ProductModel.name, unique=False)
 Index(DBTables.PRODUCTS + '_category_id_key', ProductModel.category_id, unique=False)
-Index(DBTables.CATEGORIES +  '_name_key',CategoryModel.name, unique=False)
+Index(DBTables.CATEGORIES +  '_name_id_key',CategoryModel.name, unique=False)
 Index(DBTables.ORDERS + '_user_id_key', OrderModel.user_id, unique=False)
 Index(DBTables.ORDER_ITEMS + '_order_id_key', OrderItemModel.order_id, unique=False)
 Index(DBTables.ORDER_ITEMS + '_product_id_key', OrderItemModel.product_id, unique=False)
