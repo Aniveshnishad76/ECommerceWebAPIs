@@ -4,7 +4,12 @@
 class DBTables:
     """Database tables class"""
     USER                   = 'user'
-    ADMIN                  = 'admin'
+    PRODUCTS               = 'products'
+    CATEGORIES             = 'categories'
+    ORDERS                 = 'orders'
+    ORDER_ITEMS            = 'order_items'
+    PAYMENTS               = 'payments'
+    REVIEWS                = 'reviews'
 
 
 class DBConfig:

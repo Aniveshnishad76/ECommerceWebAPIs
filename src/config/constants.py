@@ -22,6 +22,36 @@ class MasterConstants:
     DEFAULT_DATE_FORMAT = "%Y-%m-%d"
 
 
-class StatusConstant:
-    """status constant"""
+class UserStatusConstant:
+    """Users status constant"""
     Active = 1
+    Inactive = 0
+
+
+class ProductStatusConstant:
+    """Products status constant"""
+    Active = 1
+    Inactive = 0
+
+
+class CategoriesStatusConstant:
+    """Categories status constant"""
+    Active = 1
+    Inactive = 0
+
+
+class OrderStatusConstant:
+    """Orders status constant"""
+    Success = 1
+    Pending = 2
+    Failed = 0
+    Canceled = 3
+
+
+class PaymentsMethodsConstant:
+    """Orders status constant"""
+    Cash = 1
+    Paytm = 2
+    PhonePay = 3
+    DebitCart = 4
+    CreditCart = 5
