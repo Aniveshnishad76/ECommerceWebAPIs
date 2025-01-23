@@ -1,5 +1,6 @@
 """common functions file"""
 import time
+import bcrypt
 import jwt
 from src.config.env import BaseConfig
 
@@ -11,9 +12,17 @@ def generate_jwt_token(email: str):
         "exp": int(time.time()) + 3600,
     }
     token = jwt.encode(payload, BaseConfig.SECRET_KEY, algorithm=BaseConfig.ALGORITHM)
-    return {"email": token}
+    return token
 
-def encode_jwt_token(password: str):
-    """Encode JWT token"""
-    password = jwt.encode(payload=password, key=BaseConfig.SECRET_KEY, algorithm=BaseConfig.ALGORITHM)
-    return {"password": password}
+def decode_jwt_token(token: str):
+    """Decode JWT token"""
+    email = jwt.decode(token, BaseConfig.SECRET_KEY, algorithms=[BaseConfig.ALGORITHM])
+    return email
+
+def hash_password(password: str):
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed.decode('utf-8')
+
+def verify_password(password: str, hashed_password: str):
+    return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))

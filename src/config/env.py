@@ -1,6 +1,4 @@
-"""
-file to contain the env specific configs
-"""
+"""file to contain the env specific configs"""
 import os
 from functools import lru_cache
 from pydantic_settings import BaseSettings
@@ -34,6 +32,7 @@ class BaseConfig(BaseSettings):
     redis_port: int = os.getenv("BROKER_PORT", 6379)
     redis_host: str = os.getenv("BROKER_HOST", "localhost")
     redis_db: int = 13
+    default_email: str = os.getenv("DEFAULT_EMAIL", "anivesh.nishad76@gmail.com")
     jwt_secret: str = os.getenv("JWT_SECRET", "my_str")
     jwt_algorithm: str = os.getenv("JWT_ALGORITHM", "HS256")
 
