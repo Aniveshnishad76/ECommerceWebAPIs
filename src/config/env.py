@@ -34,6 +34,8 @@ class BaseConfig(BaseSettings):
     redis_port: int = os.getenv("BROKER_PORT", 6379)
     redis_host: str = os.getenv("BROKER_HOST", "localhost")
     redis_db: int = 13
+    jwt_secret: str = os.getenv("JWT_SECRET", "my_str")
+    jwt_algorithm: str = os.getenv("JWT_ALGORITHM", "HS256")
 
 
 @lru_cache()
