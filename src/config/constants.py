@@ -12,7 +12,7 @@ RESPONSE_HEADERS = {
     "Content-Security-Policy": "script-src 'self'",
 }
 
-ExternalApiTIMEOUT = 25
+ExternalApiTIMEOUT = 2
 
 class MasterConstants:
     """Master Constants"""

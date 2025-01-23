@@ -22,7 +22,7 @@ class AppDBConfig(DBConfig):
     """
 
     db_host: str = os.getenv("DB_HOST", "localhost:5432")
-    db_name: str = os.getenv("DB_NAME", "app-web")
+    db_name: str = os.getenv("DB_NAME", "app_test")
     db_username: str = os.getenv("DB_USERNAME", "postgres")
     db_password: str = os.getenv("DB_PASSWORD", "root")
 
@@ -34,6 +34,8 @@ class BaseConfig(BaseSettings):
     redis_port: int = os.getenv("BROKER_PORT", 6379)
     redis_host: str = os.getenv("BROKER_HOST", "localhost")
     redis_db: int = 13
+    jwt_secret: str = os.getenv("JWT_SECRET", "5cbd8f1a156a0551a3fa035b978c7ff142fd945576f0436df17408b5d470a0d8")
+    jwt_algorithm: str = os.getenv("JWT_ALGORITHM", "HS256")
 
 
 @lru_cache()

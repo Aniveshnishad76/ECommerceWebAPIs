@@ -1,7 +1,7 @@
 """
 main
 """
-from contextlib import asynccontextmanager
+# from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
@@ -10,7 +10,7 @@ from src.config.constants import APP_CONTEXT_PATH, APP_CONTEXT_PATH_v2
 from src.versions.v1 import main as v1_route
 from src.versions.v1 import internal as v1_route_internal
 from src.config.env import get_settings
-from src.lib.redis import redis_cache
+# from src.lib.redis import redis_cache
 from fastapi.middleware.gzip import GZipMiddleware
 
 config = get_settings()
@@ -21,13 +21,13 @@ app = FastAPI(
     description="This application will serve APIs for E-Commerce web application",
 )
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup
-    await redis_cache.init_cache()
-    yield
-    # Shutdown
-    await redis_cache.close()
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     # Startup
+#     await redis_cache.init_cache()
+#     yield
+#     # Shutdown
+#     await redis_cache.close()
 
 
 app.add_middleware(

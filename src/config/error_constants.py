@@ -7,3 +7,7 @@ class ErrorMessage:
     RECORD_ALREADY_EXISTS = "{} already exists!"
     INVALID_ID = "Invalid {} ID!"
     INVALID_ACTION = "Invalid action!"
+    INVALID_CREDENTIAL = "Invalid Credential!"
+    LOGIN_SUCCESSFULL = "Login Successfully!"
+    CREATED_SUCCESSFULLY = 'Created Successfully'
+    FETCH_SUCCESSFULLY = 'Data Fetched Successfully'
