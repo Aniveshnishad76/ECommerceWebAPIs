@@ -14,4 +14,4 @@ class UnauthenticatedException(Exception):
 class UnauthorizedException(Exception):
     """Unauthorized Exception"""
     def __init__(self, message: str):
-        pass
+        self.message = message
