@@ -30,7 +30,7 @@ class UserModel:
         return cls.get_user(_id=_id)
 
     @classmethod
-    def get_user(cls, _id: int = None, email: str = None, ids: List[int] = None, password: str = None):
+    def get_user(cls, _id: int = None, email: str = None, ids: List[int] = None, password: str = None, is_admin: bool = False):
         """get user by id"""
         rows = db.query(UserSchema).filter(UserSchema.status == UserStatusConstant.Active)
         if _id:
@@ -39,8 +39,10 @@ class UserModel:
             rows = rows.filter(UserSchema.email == email)
         if ids:
             rows = rows.filter(UserSchema.id.in_(ids))
-        if email and password:
-            rows = rows.filter(UserSchema.email == email, UserSchema.password_hash == password)
+        if password:
+            rows = rows.filter(UserSchema.password_hash == password)
+        if is_admin:
+            rows = rows.filter(UserSchema.is_admin == is_admin)
         if not _id and not email:
             rows = select_all(rows)
         else:
