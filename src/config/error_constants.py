@@ -11,3 +11,10 @@ class ErrorMessage:
     LOGIN_SUCCESSFULL = "Login Successfully!"
     CREATED_SUCCESSFULLY = 'Created Successfully'
     FETCH_SUCCESSFULLY = 'Data Fetched Successfully'
+    INVALID_USER = "Invalid user!"
+    USER_ALREADY_EXISTS = "User already exists!"
+    PASSWORD_DO_NOT_MATCH = "Passwords do not match!"
+    AUTH_HEADER_ERROR = "Authentication failed!"
+    INVALID_TOKEN = "Invalid token!"
+    USER_ONBOARDING_ERROR = "User onboarding failed!"
+    UNAUTHORIZED_REQUEST = "Unauthorized!"

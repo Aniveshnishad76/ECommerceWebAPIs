@@ -2,7 +2,10 @@
 main
 """
 # from contextlib import asynccontextmanager
+<<<<<<< HEAD
 
+=======
+>>>>>>> f65a11ed55227fbc3571f71a15bbadf25a13dbcc
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 import uvicorn
