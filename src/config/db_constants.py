@@ -10,6 +10,7 @@ class DBTables:
     ORDER_ITEMS            = 'order_items'
     PAYMENTS               = 'payments'
     REVIEWS                = 'reviews'
+    CARTS                  = 'carts'
 
 
 class DBConfig:
