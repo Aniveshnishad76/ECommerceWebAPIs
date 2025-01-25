@@ -1,6 +1,8 @@
 """serializers file """
-from pydantic import BaseModel
-from src.utils.common_serializers import SuccessMessageOutbound
+from pydantic import BaseModel, constr
+
+from src.config.constants import ValidationRegexConstants
+from src.utils.common_serializers import CommonMessageOutbound
 
 
 class UserAppOutBound(BaseModel):
@@ -19,8 +21,8 @@ class UserAppOutBound(BaseModel):
 
 class UserLoginInbound(BaseModel):
     """user login inbound"""
-    email: str
-    password: str
+    email: constr(strip_whitespace=True, max_length=100, pattern=ValidationRegexConstants.email_regex)
+    password: constr(min_length=1, max_length=15)
 
 
 class UserLoginOutBound(BaseModel):
@@ -32,25 +34,22 @@ class UserLoginOutBound(BaseModel):
 
 class UserRegisterInbound(BaseModel):
     """user register inbound"""
-    username: str
-    email: str
-    password: str
-    full_name: str
-    phone_number: str
-    address: str = None
+    username: constr(min_length=1, max_length=15)
+    email: constr(strip_whitespace=True, max_length=100, pattern=ValidationRegexConstants.email_regex)
+    password: constr(min_length=1, max_length=15)
+    full_name: constr(min_length=1, max_length=30)
+    phone_number: constr(min_length=1, max_length=15)
+    address: constr(min_length=1, max_length=50) = None
 
 class UserDetailsOutBound(BaseModel):
     """user details outbound"""
     username: str
     email: str
-    password: str
     full_name: str
     phone_number: str
     address: str = None
-    status: int = None
 
 
-class UserFinalOutbound(SuccessMessageOutbound):
+class UserFinalOutbound(CommonMessageOutbound):
     """user final outbound"""
     data: UserDetailsOutBound = None
-

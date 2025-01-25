@@ -6,12 +6,12 @@ from src.utils.auth import Auth
 
 router = APIRouter()
 
-@router.post("/login")
+@router.post("/login", tags=["User POST"])
 async def login(payload: UserLoginInbound):
     """login route"""
     return await UserController.login(payload=payload)
 
-@router.post("/register")
+@router.post("/register", tags=["User POST"])
 async def register(payload: UserRegisterInbound):
     """login route"""
     return await UserController.register(payload=payload)

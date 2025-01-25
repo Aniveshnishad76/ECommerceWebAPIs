@@ -14,3 +14,9 @@ class ErrorMessage:
     INVALID_TOKEN = "Invalid token!"
     USER_ONBOARDING_ERROR = "User onboarding failed!"
     UNAUTHORIZED_REQUEST = "Unauthorized!"
+    INVALID_CREDENTIAL = "Invalid Credential!"
+    LOGIN_SUCCESSFULLY = "Login Successfully!"
+    CREATED_SUCCESSFULLY = 'Created Successfully'
+    FETCH_SUCCESSFULLY = 'Data Fetched Successfully'
+    RECORD_DELETED_SUCCESSFULLY = 'Record deleted successfully'
+    RECORD_UPDATED_SUCCESSFULLY = 'Record updated successfully'

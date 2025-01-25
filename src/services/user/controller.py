@@ -12,7 +12,7 @@ from src.services.user.serializer import (
     UserAppOutBound
 )
 from src.utils.common import generate_jwt_token, verify_password, hash_password
-from src.utils.common_serializers import SuccessMessageOutbound
+from src.utils.common_serializers import CommonMessageOutbound
 
 user_details_context: ContextVar[UserAppOutBound] = ContextVar("user_details")
 
@@ -29,7 +29,7 @@ class UserController:
             raise EntityException(message=ErrorMessage.PASSWORD_DO_NOT_MATCH)
         token = generate_jwt_token(email=payload.email)
         data = UserLoginOutBound(username=user.username, email=user.email, token=token)
-        return SuccessMessageOutbound(data=data.__dict__)
+        return CommonMessageOutbound(data=data.__dict__)
 
     @classmethod
     async def register(cls, payload: UserRegisterInbound):
@@ -38,10 +38,12 @@ class UserController:
             user = UserModel.get_user(email=payload.email)
             if user:
                 raise EntityException(message=ErrorMessage.USER_ALREADY_EXISTS)
-        if payload.password:
-            payload.password = hash_password(payload.password)
-        user = UserModel.create(**payload.dict())
-        return cls.get_by_id(_id=user.id)
+        payload.password  = hash_password(payload.password)
+        payload = payload.dict()
+        if payload.get('password') and payload['password']:
+            payload["password_hash"] = payload.pop("password")
+        user = UserModel.create(**payload)
+        return await cls.get_by_id(_id=user.id)
 
     @classmethod
     async def get_by_id(cls, _id: int):

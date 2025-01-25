@@ -21,6 +21,10 @@ class MasterConstants:
     DATETIME_FORMAT_WITHOUT_T = "%Y-%m-%d %H:%M:%S"
     DEFAULT_DATE_FORMAT = "%Y-%m-%d"
 
+class ValidationRegexConstants:
+    """Validation Regex Constants"""
+    email_regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+
 
 class UserStatusConstant:
     """Users status constant"""
@@ -42,7 +46,8 @@ class CategoriesStatusConstant:
 
 class OrderStatusConstant:
     """Orders status constant"""
-    Success = 1
+    Placed = 1
+    Success = 4
     Pending = 2
     Failed = 0
     Canceled = 3
