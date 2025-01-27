@@ -44,11 +44,11 @@ These instructions will get you a copy of the project up and running on your loc
 - Create a database and then either store the credentials in global variable from terminal, or create a .env file and store them there. This is required by alembic to make db connection.
 - Optional : if alembic version is not present, generate one.
     ```bash
-    alembic -c ./src/alembic.ini revision --autogenerate -m "1st version"
+    alembic -c ./alembic.ini revision --autogenerate -m "1st version"
     ```
 - Create database schema using alembic
     ```bash
-    alembic -c ./src/alembic.ini upgrade head
+    alembic -c ./alembic.ini upgrade head
     ```
     if there are any error in this command check
     - database connection and credentials
