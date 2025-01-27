@@ -2,8 +2,9 @@
 import time
 import bcrypt
 import jwt
-from src.config.env import BaseConfig
+from src.config.env import get_settings
 
+BaseConfig = get_settings()
 
 def generate_jwt_token(email: str):
     """Generate a JWT token"""
@@ -11,12 +12,12 @@ def generate_jwt_token(email: str):
         "email": email,
         "exp": int(time.time()) + 3600,
     }
-    token = jwt.encode(payload, BaseConfig.SECRET_KEY, algorithm=BaseConfig.ALGORITHM)
+    token = jwt.encode(payload, BaseConfig.jwt_secret, algorithm=BaseConfig.jwt_algorithm)
     return token
 
 def decode_jwt_token(token: str):
     """Decode JWT token"""
-    email = jwt.decode(token, BaseConfig.SECRET_KEY, algorithms=[BaseConfig.ALGORITHM])
+    email = jwt.decode(token, BaseConfig.jwt_secret, algorithms=[BaseConfig.jwt_algorithm])
     return email
 
 def hash_password(password: str):

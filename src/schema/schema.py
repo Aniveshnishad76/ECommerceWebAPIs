@@ -133,6 +133,7 @@ class ReviewModel(Base):
     status                    = Column(SMALLINT, nullable=False, default=1)
 
 
+
 # Indexing
 Index(DBTables.USER + '_username_key', UserModel.username, unique=False)
 Index(DBTables.USER + '_email_key', UserModel.email, unique=False)
