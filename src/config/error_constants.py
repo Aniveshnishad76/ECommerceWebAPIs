@@ -20,3 +20,6 @@ class ErrorMessage:
     FETCH_SUCCESSFULLY = 'Data Fetched Successfully'
     RECORD_DELETED_SUCCESSFULLY = 'Record deleted successfully'
     RECORD_UPDATED_SUCCESSFULLY = 'Record updated successfully'
+    MISSING_FILED_TO_UPDATE = "Missing field to update!"
+    STOCKS_NOT_AVAILABLE = "Stocks not available!"
+    USERNAME_ALREADY_EXISTS = "Username already exists!"

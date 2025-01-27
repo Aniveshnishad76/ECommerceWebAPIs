@@ -1,10 +1,9 @@
 """user model file"""
 from datetime import datetime
 from typing import List
-
 from src.config.constants import UserStatusConstant
 from src.config.env import get_settings
-from src.db.session import get_db, save_new_row, update_old_row, select_all, select_first
+from src.db.session import get_db, save_new_row, update_old_row, select_all, select_first, delete
 from src.services.user.schema import UserSchema
 
 db = get_db()
@@ -34,7 +33,7 @@ class UserModel:
         return cls.get_user(_id=_id)
 
     @classmethod
-    def get_user(cls, _id: int = None, email: str = None, ids: List[int] = None, password: str = None, is_admin: bool = False):
+    def get_user(cls, _id: int = None, email: str = None, ids: List[int] = None, password: str = None, user_name: str = None, is_admin: bool = False):
         """get user by id"""
         rows = db.query(UserSchema).filter(UserSchema.status == UserStatusConstant.Active)
         if _id:
@@ -47,8 +46,18 @@ class UserModel:
             rows = rows.filter(UserSchema.password_hash == password)
         if is_admin:
             rows = rows.filter(UserSchema.is_admin == is_admin)
+        if user_name:
+            rows = rows.filter(UserSchema.username == user_name)
         if not _id and not email:
             rows = select_all(rows)
         else:
             rows = select_first(rows)
         return rows
+
+    @classmethod
+    def delete(cls, _id: int):
+        """delete user by id"""
+        rows = db.query(UserSchema).filter(UserSchema.status == UserStatusConstant.Active)
+        if _id:
+            rows = rows.filter(UserSchema.id == _id)
+        return delete(rows)

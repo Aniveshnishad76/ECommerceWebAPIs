@@ -5,7 +5,6 @@ from typing import List
 from src.db.session import get_db, save_new_row, update_old_row, select_all, select_first, delete
 from src.config.constants import OrderStatusConstant
 from src.services.order.schema import OrderSchema
-from src.services.order_items.model import OrderItemsModel
 
 db = get_db()
 
@@ -33,13 +32,19 @@ class OrderModel:
         return cls.get(_id=_id)
 
     @classmethod
-    def get(cls, _id: int = None, ids: List[int] = None):
+    def get(cls, _id: int = None, ids: List[int] = None, status: List[int] = None, user_id: int = None, page: int = 1, size: int = 10):
         """method to get orders"""
-        rows = db.query(OrderSchema).filter(OrderSchema.status == OrderStatusConstant.Placed)
+        offset = (page - 1) * size
+        rows = db.query(OrderSchema)
+        if status:
+            rows = rows.filter(OrderSchema.status.in_(status))
         if _id:
             rows = rows.filter(OrderSchema.id == _id)
         if ids:
             rows = rows.filter(OrderSchema.id.in_(ids))
+        if user_id:
+            rows = rows.filter(OrderSchema.user_id == user_id)
+        rows = rows.offset(offset).limit(size)
         if not _id:
             rows = select_all(rows)
         else:

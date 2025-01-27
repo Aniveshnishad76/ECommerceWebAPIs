@@ -21,7 +21,7 @@ class Auth:
         @wraps(func)
         async def wrapper(request: Request, *args, **kwargs):
             if config.env != 'local' and "authorization" not in request.headers or not request.headers["authorization"]:
-                raise UnauthenticatedException(message=ErrorMessage.AUTH_HEADER_ERROR)
+                return UnauthenticatedException(message=ErrorMessage.AUTH_HEADER_ERROR)
             try:
                 if config.env != 'local':
                     token = request.headers["authorization"]
@@ -36,7 +36,6 @@ class Auth:
             return await func(request, *args, **kwargs)
         return wrapper
 
-
     @classmethod
     def authenticate_user(cls, func):
         """Authenticate user"""
@@ -46,7 +45,7 @@ class Auth:
                     "authorization" not in request.headers
                     or not request.headers["authorization"]
             ):
-                raise UnauthenticatedException(message=ErrorMessage.AUTH_HEADER_ERROR)
+                return UnauthenticatedException(message=ErrorMessage.AUTH_HEADER_ERROR)
             if config.env != "local":
                 # Temp Expire Token Check
                 token = request.headers["authorization"]
@@ -58,30 +57,30 @@ class Auth:
                     token,
                     algorithms="RS256",
                     options={"verify_signature": False},
-                )["sub"]
+                )["email"]
                 email = email.lower()
             else:
                 email = config.default_email
 
             user_details = await UserController.get_user_by_email(email=email)
             if not user_details.data or user_details.data.status != UserStatusConstant.Active:
-                raise UnauthenticatedException(message=ErrorMessage.USER_ONBOARDING_ERROR)
+                return UnauthenticatedException(message=ErrorMessage.USER_ONBOARDING_ERROR)
 
-            user_details_context.set(user_details)
+            user_details_context.set(user_details.data)
             return await func(request, *args, **kwargs)
         return wrapper
 
-    @classmethod
-    def authorize_user(cls, func):
-        """Authorize user"""
-        @wraps(func)
-        async def wrapper(request: Request, *args, **kwargs):
-            user_details = user_details_context.get()
-            if not user_details.is_admin:
-                return await func(request, *args, **kwargs)
-            raise UnauthenticatedException(message=ErrorMessage.UNAUTHORIZED_REQUEST)
-
-        return wrapper
+    # @classmethod
+    # def authorize_user(cls, func):
+    #     """Authorize user"""
+    #     @wraps(func)
+    #     async def wrapper(request: Request, *args, **kwargs):
+    #         # user_details = user_details_context.get()
+    #         # if not user_details.is_admin:
+    #             return await func(request, *args, **kwargs)
+    #         return UnauthenticatedException(message=ErrorMessage.UNAUTHORIZED_REQUEST)
+    #
+    #     return wrapper
 
     @classmethod
     def authorize_admin(cls, func):
@@ -90,7 +89,44 @@ class Auth:
         async def wrapper(request: Request, *args, **kwargs):
             user_details = user_details_context.get()
             if not user_details.is_admin:
-                raise UnauthenticatedException(message=ErrorMessage.UNAUTHORIZED_REQUEST)
+                return UnauthenticatedException(message=ErrorMessage.UNAUTHORIZED_REQUEST)
+            return await func(request, *args, **kwargs)
+
+        return wrapper
+
+    @classmethod
+    def authenticate_admin(cls, func):
+        """Authenticate admin"""
+
+        @wraps(func)
+        async def wrapper(request: Request, *args, **kwargs):
+            if config.env != "local" and (
+                    "authorization" not in request.headers
+                    or not request.headers["authorization"]
+            ):
+                return UnauthenticatedException(message=ErrorMessage.AUTH_HEADER_ERROR)
+            if config.env != "local":
+                # Temp Expire Token Check
+                token = request.headers["authorization"]
+                # exp_token = await redis_cache.get(key=RedisKey.USER_EXPIRE_SESSION_TOKEN.format(token=token))
+                # if exp_token:
+                #     raise UnauthenticatedException(message=ErrorMessage.INVALID_TOKEN)
+
+                email = jwt.decode(
+                    token,
+                    algorithms="RS256",
+                    options={"verify_signature": False},
+                )["email"]
+                email = email.lower()
+            else:
+                email = config.default_email
+            user_details = await UserController.get_user_by_email(email=email)
+
+            if not user_details.data or user_details.data.status != UserStatusConstant.Active:
+                return UnauthenticatedException(message=ErrorMessage.USER_ONBOARDING_ERROR)
+            if not user_details.data.is_admin:
+                return UnauthenticatedException(message=ErrorMessage.USER_ONBOARDING_ERROR)
+            user_details_context.set(user_details.data)
             return await func(request, *args, **kwargs)
 
         return wrapper

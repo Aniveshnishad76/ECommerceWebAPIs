@@ -31,8 +31,9 @@ class CategoryModel:
         return cls.get(_id=_id)
 
     @classmethod
-    def get(cls, _id: int = None, ids: List[int] = None, name: str = None):
+    def get(cls, _id: int = None, ids: List[int] = None, name: str = None, page: int = 1, size: int = 10):
         """method to get category by id"""
+        offset = (page - 1) * size
         rows = db.query(CategorySchema).filter(CategorySchema.status == CategoriesStatusConstant.Active)
         if _id:
             rows = rows.filter(CategorySchema.id == _id)
@@ -40,6 +41,7 @@ class CategoryModel:
             rows = rows.filter(CategorySchema.id.in_(ids))
         if name:
             rows = rows.filter(CategorySchema.name == name)
+        rows = rows.offset(offset).limit(size)
         if not _id:
             rows = select_all(rows)
         else:

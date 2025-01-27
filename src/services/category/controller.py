@@ -21,14 +21,14 @@ class CategoryController:
         return response
 
     @classmethod
-    async def get_category(cls, _id: int = None):
+    async def get_category(cls, _id: int = None, page: int = 1, size: int = 10):
         """category get by id function"""
 
-        data = CategoryModel.get(_id=_id)
+        data = CategoryModel.get(_id=_id, page=page, size=size)
         if not data:
             return CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)
         if _id:
-            result = CategoryAddOutBound(**data.__dict__)
+            result = CategoryAddOutBound(**data.__dict__).__dict__
         else:
             result = [CategoryAddOutBound(**category.__dict__) for category in data]
 
@@ -47,10 +47,13 @@ class CategoryController:
     @classmethod
     async def category_update(cls, payload: CategoryUpdateInBound):
         """category update function"""
-
+        if not payload.name and not payload.description:
+            return CommonMessageOutbound(message=ErrorMessage.MISSING_FILED_TO_UPDATE)
+        payload_dict = payload.dict(exclude_unset=True, exclude_none=True)
         category = CategoryModel.get(_id=payload.id)
         if not category:
             return CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)
 
-        data = CategoryModel.patch(_id=payload.id, **payload.__dict__)
+        data = CategoryModel.patch(_id=payload.id, **payload_dict)
+        data = CategoryAddOutBound(**data.__dict__)
         return CommonMessageOutbound(message=ErrorMessage.RECORD_UPDATED_SUCCESSFULLY, data=data.__dict__)
