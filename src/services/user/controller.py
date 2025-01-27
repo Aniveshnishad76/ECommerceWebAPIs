@@ -24,9 +24,9 @@ class UserController:
         """login function"""
         user = UserModel.get_user(email=payload.email)
         if not user:
-            raise EntityException(message=ErrorMessage.INVALID_USER)
+            return CommonMessageOutbound(message=ErrorMessage.INVALID_USER)
         if not verify_password(password=payload.password, hashed_password=user.password_hash):
-            raise EntityException(message=ErrorMessage.PASSWORD_DO_NOT_MATCH)
+            return CommonMessageOutbound(message=ErrorMessage.PASSWORD_DO_NOT_MATCH)
         token = generate_jwt_token(email=payload.email)
         data = UserLoginOutBound(username=user.username, email=user.email, token=token)
         return CommonMessageOutbound(data=data.__dict__)
@@ -37,7 +37,7 @@ class UserController:
         if payload.email:
             user = UserModel.get_user(email=payload.email)
             if user:
-                raise EntityException(message=ErrorMessage.USER_ALREADY_EXISTS)
+                return CommonMessageOutbound(message=ErrorMessage.USER_ALREADY_EXISTS)
         payload.password  = hash_password(payload.password)
         payload = payload.dict()
         if payload.get('password') and payload['password']:
@@ -81,7 +81,7 @@ class UserController:
         """Get user by id"""
         user = UserModel.get_user(_id=_id)
         if not user:
-            raise EntityException(message=ErrorMessage.RECORD_NOT_FOUND)
+            return CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)
         return UserFinalOutbound(data=UserDetailsOutBound(**user.__dict__))
 
     @classmethod
@@ -89,5 +89,5 @@ class UserController:
         """Get user by email"""
         user = UserModel.get_user(email=email)
         if not user:
-            raise EntityException(message=ErrorMessage.RECORD_NOT_FOUND)
+            return CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)
         return UserFinalOutbound(data=UserDetailsOutBound(**user.__dict__))
