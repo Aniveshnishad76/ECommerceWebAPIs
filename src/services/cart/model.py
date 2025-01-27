@@ -4,7 +4,7 @@ from typing import List
 from src.config.constants import UserStatusConstant
 from src.config.env import get_settings
 from src.db.session import get_db, save_new_row, update_old_row, select_all, select_first, delete
-from src.services.user.schema import CartSchema
+from src.services.cart.schema import CartSchema
 
 db = get_db()
 config = get_settings()
@@ -33,6 +33,6 @@ class CartModel:
     def delete_item(cls, _id: int = None):
         """method to delete item from cart"""
 
-        obj = db.query(CartSchema).filter(CartSchema.id = _id).first()
+        obj = db.query(CartSchema).filter(CartSchema.id == _id).first()
         delete(obj)
         return obj

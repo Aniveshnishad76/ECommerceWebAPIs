@@ -11,13 +11,13 @@ async def add_to_cart(payload: CartInBound):
     
     return await CartController.add_to_cart(payload=payload)
 
-@router.post("/cart-items")
+@router.get("/cart-items")
 async def read_all_items():
     """read all cart items route"""
 
     return await CartController.read_all_items()
 
-@router.post("/remove-cart-item/{_id}")
+@router.get("/remove-cart-item/{_id}")
 async def remove_items(_id):
     """remove cart from item route"""
 

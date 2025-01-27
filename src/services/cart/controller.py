@@ -1,18 +1,14 @@
 """user controller file"""
-from contextvars import ContextVar
 from src.config.error_constants import ErrorMessage
 from src.exceptions.errors.generic import EntityException
 from src.services.cart.model import CartModel
 from src.services.user.model import UserModel
-from src.services.user.serializer import (
+from src.services.cart.serializer import (
     CartInBound,
     CartOutBound,
     CartMultiFinalOutBound,
 
 )
-from src.utils.common import generate_jwt_token, verify_password, hash_password
-
-user_details_context: ContextVar[UserAppOutBound] = ContextVar("user_details")
 
 
 class CartController:
@@ -41,13 +37,14 @@ class CartController:
         for cart_item in cart_items:
             product = ProductModel.get_product(_id=cart_item.product_id)
             response.append(CartOutBound(id=cart.id, user_id=cart_item.user_id, product=product.__dict__))
-            yield cart_item
 
         return CartMultiFinalOutBound(data=response)
 
     @classmethod
     async def remove_cart_item(cls, _id: int):
         """remove item from the cart"""
-
-        CartModel.delete_item(_id=_id)
+        try:
+            CartModel.delete_item(_id=_id)
+        except:
+            raise EntityException(message=ErrorMessage.INVALID_ID.format("product")) 
         return {"message": "itme removed", "success": True}
