@@ -68,7 +68,7 @@ async def create_product(request: Request, payload: ProductInBound):
 @router.delete("/category", tags=["Admin DELETE"])
 @Auth.authenticate_admin
 @Auth.authorize_admin
-async def delete_category(request: Request, _id: int = None):
+async def delete_category(request: Request, _id: int):
 
     """route for delete category"""
     return await CategoryController.delete_category(_id=_id)
@@ -76,7 +76,7 @@ async def delete_category(request: Request, _id: int = None):
 @router.delete("/product", tags=["Admin DELETE"])
 @Auth.authenticate_admin
 @Auth.authorize_admin
-async def delete_product(request: Request, _id: int = None):
+async def delete_product(request: Request, _id: int):
 
     """route for delete product"""
     return await ProductController.delete_product(_id=_id)

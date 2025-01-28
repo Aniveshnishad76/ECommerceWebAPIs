@@ -126,6 +126,7 @@ class OrdersController:
             order_response = []
             for order_ in order or []:
                 order_item = OrderItemsModel.get(order_id=order_.id)
+                items_data = [] 
                 for item in order_item or []:
                     product = await ProductController.get_product(_id=item.product_id)
                     items_data.append(

@@ -68,7 +68,7 @@ class UserController:
         """profile function"""
         user_data = user_details_context.get()
         if payload.username:
-            user = UserModel.get_user(user_name=user_data.username)
+            user = UserModel.get_user(user_name=payload.username)
             if user:
                 return CommonMessageOutbound(message=ErrorMessage.USERNAME_ALREADY_EXISTS)
         payload_dict = payload.dict(exclude_none=True, exclude_unset=True)
