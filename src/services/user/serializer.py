@@ -47,7 +47,7 @@ class UserDetailsOutBound(BaseModel):
     email: str
     full_name: str
     phone_number: str
-    address: str = None
+    address: str = ''
     status: int = None
     is_admin: bool = None
 

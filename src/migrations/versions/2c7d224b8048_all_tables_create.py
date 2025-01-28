@@ -104,8 +104,8 @@ def upgrade() -> None:
     )
     op.create_index('reviews_product_id_key', 'reviews', ['product_id'], unique=False, schema='public')
     op.create_index('reviews_user_id_key', 'reviews', ['user_id'], unique=False, schema='public')
-    op.add_column('user', sa.Column('username', sa.VARCHAR(length=50), nullable=False))
-    op.add_column('user', sa.Column('password_hash', sa.VARCHAR(length=255), nullable=False))
+    op.add_column('user', sa.Column('username', sa.VARCHAR(length=50), nullable=True))
+    op.add_column('user', sa.Column('password_hash', sa.VARCHAR(length=255), nullable=True))
     op.add_column('user', sa.Column('full_name', sa.VARCHAR(length=100), nullable=True))
     op.add_column('user', sa.Column('phone_number', sa.VARCHAR(length=20), nullable=True))
     op.add_column('user', sa.Column('address', sa.VARCHAR(length=255), nullable=True))
@@ -119,6 +119,32 @@ def upgrade() -> None:
     op.drop_column('user', 'first_name')
     op.drop_column('user', 'last_name')
     op.drop_column('user', 'mobile_number')
+    op.execute(
+        sa.text(
+            """
+            UPDATE public.user
+            SET username = :username,
+                password_hash = :password_hash,
+                email = :email,
+                full_name = :full_name,
+                phone_number = :phone_number,
+                status = :status,
+                meta_data = :meta_data,
+                is_admin = :is_admin
+            WHERE id = :id
+            """
+        ).params(
+            id=1,
+            username='AniveshNishad76',
+            password_hash='$2b$12$Bqjm.AxrzPOwYyo9Xn4SbOBHsUbqVDOQlaF7gpJ9cZqwXzGAy9TPa',
+            email='anivesh.nishad@gmail.com',
+            full_name="Anivesh Nishad",
+            phone_number='9589957396',
+            status=1,
+            meta_data='{}',
+            is_admin=True
+        )
+    )
     # ### end Alembic commands ###
 
 
