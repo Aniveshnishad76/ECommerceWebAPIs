@@ -3,7 +3,7 @@ from src.config.constants import UserStatusConstant
 from src.services.admin.serializers import AdminLoginInbound, AdminLoginOutBound
 from src.services.user.controller import user_details_context, UserController
 from src.services.user.model import UserModel
-from src.utils.common import generate_jwt_token
+from src.utils.common import generate_jwt_token, verify_password, hash_password
 from src.config.error_constants import ErrorMessage
 from fastapi import status
 from src.utils.common_serializers import CommonMessageOutbound
@@ -14,9 +14,11 @@ class AdminController:
     @classmethod
     async def login(cls, payload: AdminLoginInbound):
         """login function"""
-        user = UserModel.get_user(email=payload.email, password=payload.password, is_admin=True)
+        user = UserModel.get_user(email=payload.email, is_admin=True)
         if not user:
             return CommonMessageOutbound(status_code=status.HTTP_401_UNAUTHORIZED, message=ErrorMessage.INVALID_CREDENTIAL)
+        if not verify_password(password=payload.password, hashed_password=user.password_hash):
+            return CommonMessageOutbound(message=ErrorMessage.PASSWORD_DO_NOT_MATCH)
         token = generate_jwt_token(email=payload.email)
         data = AdminLoginOutBound(username=user.username, email=user.email, token=token)
         response = CommonMessageOutbound(message=ErrorMessage.LOGIN_SUCCESSFULLY, data=data.__dict__)

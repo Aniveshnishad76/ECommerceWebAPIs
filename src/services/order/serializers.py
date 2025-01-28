@@ -9,7 +9,7 @@ from src.services.user.serializer import UserAppOutBound
 class OrderSaveInbound(BaseModel):
     """order save inbound"""
     user_id: conint(strict=True, gt=0)
-    total: confloat(strict=True, gt=0)
+    total: confloat(strict=True, ge=0)
 
 
 class OrderInbound(BaseModel):
