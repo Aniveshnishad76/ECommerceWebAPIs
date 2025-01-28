@@ -31,6 +31,10 @@ def upgrade() -> None:
     sa.UniqueConstraint('email', name='user_auth_email_key'),
     schema='public'
     )
+    op.execute(sa.text(
+        "INSERT INTO public.user (id, name, email, mobile_number, status, meta_data) "
+        "VALUES (:id, :name, :email, :mobile_number, :status, :meta_data)"
+    ).params(id=1, name='Anivesh Nishad', email='anivesh.nishad76@gmail.com', mobile_number='9589957396', status=1, meta_data='{}'))
     # ### end Alembic commands ###
 
 

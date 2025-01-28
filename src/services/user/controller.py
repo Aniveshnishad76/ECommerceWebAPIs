@@ -1,7 +1,6 @@
 """user controller file"""
 from contextvars import ContextVar
 from src.config.error_constants import ErrorMessage
-from src.exceptions.errors.generic import EntityException
 from src.services.user.model import UserModel
 from src.services.user.serializer import (
     UserLoginInbound,
@@ -82,7 +81,18 @@ class UserController:
         user = UserModel.get_user(_id=_id)
         if not user:
             return CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)
-        return UserFinalOutbound(data=UserDetailsOutBound(**user.__dict__))
+        return UserFinalOutbound(
+            data=UserDetailsOutBound(
+                id=user.id,
+                username=user.username,
+                email=user.email,
+                full_name=user.full_name if user.full_name else None,
+                phone_number=user.phone_number if user.phone_number else None,
+                address=user.address if user.address else '',
+                status=user.status,
+                is_admin=user.is_admin,
+            )
+        )
 
     @classmethod
     async def get_user_by_email(cls, email):
@@ -90,4 +100,15 @@ class UserController:
         user = UserModel.get_user(email=email)
         if not user:
             return CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)
-        return UserFinalOutbound(data=UserDetailsOutBound(**user.__dict__))
+        return UserFinalOutbound(
+            data=UserDetailsOutBound(
+                id=user.id,
+                username=user.username,
+                email=user.email,
+                full_name=user.full_name if user.full_name else None,
+                phone_number=user.phone_number if user.phone_number else None,
+                address=user.address if user.address else '',
+                status=user.status,
+                is_admin=user.is_admin,
+            )
+        )
