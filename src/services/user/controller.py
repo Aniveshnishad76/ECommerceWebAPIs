@@ -1,5 +1,8 @@
 """user controller file"""
 from contextvars import ContextVar
+from fastapi import status
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from src.config.error_constants import ErrorMessage
 from src.services.user.model import UserModel
 from src.services.user.serializer import (
@@ -23,12 +26,13 @@ class UserController:
         """login function"""
         user = UserModel.get_user(email=payload.email)
         if not user:
-            return CommonMessageOutbound(message=ErrorMessage.INVALID_USER)
+            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.INVALID_USER)))
         if not verify_password(password=payload.password, hashed_password=user.password_hash):
-            return CommonMessageOutbound(message=ErrorMessage.PASSWORD_DO_NOT_MATCH)
+            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST,content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.PASSWORD_DO_NOT_MATCH)))
         token = generate_jwt_token(email=payload.email)
         data = UserLoginOutBound(username=user.username, email=user.email, token=token)
-        return CommonMessageOutbound(data=data.__dict__)
+        data = CommonMessageOutbound(data=data.__dict__)
+        return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(data))
 
     @classmethod
     async def register(cls, payload: UserRegisterInbound):
@@ -36,7 +40,11 @@ class UserController:
         if payload.email:
             user = UserModel.get_user(email=payload.email)
             if user:
-                return CommonMessageOutbound(message=ErrorMessage.USER_ALREADY_EXISTS)
+                return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.USER_ALREADY_EXISTS)))
+        if payload.username:
+            user = UserModel.get_user(user_name=payload.username)
+            if user:
+                return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.USER_ALREADY_EXISTS)))
         payload.password  = hash_password(payload.password)
         payload = payload.dict()
         if payload.get('password') and payload['password']:
@@ -59,8 +67,8 @@ class UserController:
             password = hash_password(new_password)
             UserModel.patch(_id=user.id, **{"password_hash": password})
             updated_data = await cls.get_by_id(_id=user.id)
-            return CommonMessageOutbound(message=ErrorMessage.RECORD_UPDATED_SUCCESSFULLY, data=updated_data.data.__dict__)
-        return CommonMessageOutbound(message=ErrorMessage.PASSWORD_DO_NOT_MATCH)
+            return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_UPDATED_SUCCESSFULLY, data=jsonable_encoder(updated_data))))
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.PASSWORD_DO_NOT_MATCH)))
 
     @classmethod
     async def profile(cls, payload: UserProfileInbound):
@@ -69,18 +77,18 @@ class UserController:
         if payload.username:
             user = UserModel.get_user(user_name=payload.username)
             if user:
-                return CommonMessageOutbound(message=ErrorMessage.USERNAME_ALREADY_EXISTS)
+                return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.USERNAME_ALREADY_EXISTS)))
         payload_dict = payload.dict(exclude_none=True, exclude_unset=True)
         UserModel.patch(_id=user_data.id, **payload_dict)
         updated_data = await cls.get_by_id(_id=user_data.id)
-        return CommonMessageOutbound(message=ErrorMessage.RECORD_UPDATED_SUCCESSFULLY, data=updated_data.data.__dict__)
+        return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_UPDATED_SUCCESSFULLY, data=jsonable_encoder(updated_data.data))))
 
     @classmethod
     async def get_by_id(cls, _id: int):
         """Get user by id"""
         user = UserModel.get_user(_id=_id)
         if not user:
-            return CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)
+            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)))
         return UserFinalOutbound(
             data=UserDetailsOutBound(
                 id=user.id,
@@ -99,7 +107,7 @@ class UserController:
         """Get user by email"""
         user = UserModel.get_user(email=email)
         if not user:
-            return CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)
+            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)))
         return UserFinalOutbound(
             data=UserDetailsOutBound(
                 id=user.id,

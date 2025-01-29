@@ -1,7 +1,9 @@
 """Auth"""
 from functools import wraps
 import jwt
-from fastapi import Request
+from fastapi import Request, status
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from src.config.error_constants import ErrorMessage
 from src.config.constants import UserStatusConstant
 from src.exceptions.errors.generic import UnauthenticatedException
@@ -21,7 +23,7 @@ class Auth:
         @wraps(func)
         async def wrapper(request: Request, *args, **kwargs):
             if config.env != 'local' and "authorization" not in request.headers or not request.headers["authorization"]:
-                return UnauthenticatedException(message=ErrorMessage.AUTH_HEADER_ERROR)
+                return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=jsonable_encoder(UnauthenticatedException(message=ErrorMessage.AUTH_HEADER_ERROR)))
             try:
                 if config.env != 'local':
                     token = request.headers["authorization"]
@@ -45,7 +47,7 @@ class Auth:
                     "authorization" not in request.headers
                     or not request.headers["authorization"]
             ):
-                return UnauthenticatedException(message=ErrorMessage.AUTH_HEADER_ERROR)
+                return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=jsonable_encoder(UnauthenticatedException(message=ErrorMessage.AUTH_HEADER_ERROR)))
             if config.env != "local":
                 # Temp Expire Token Check
                 token = request.headers["authorization"]
@@ -64,7 +66,7 @@ class Auth:
 
             user_details = await UserController.get_user_by_email(email=email)
             if not user_details.data or user_details.data.status != UserStatusConstant.Active:
-                return UnauthenticatedException(message=ErrorMessage.USER_ONBOARDING_ERROR)
+                return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=jsonable_encoder(UnauthenticatedException(message=ErrorMessage.USER_ONBOARDING_ERROR)))
 
             user_details_context.set(user_details.data)
             return await func(request, *args, **kwargs)
@@ -89,7 +91,7 @@ class Auth:
         async def wrapper(request: Request, *args, **kwargs):
             user_details = user_details_context.get()
             if not user_details.is_admin:
-                return UnauthenticatedException(message=ErrorMessage.UNAUTHORIZED_REQUEST)
+                return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content=jsonable_encoder(UnauthenticatedException(message=ErrorMessage.UNAUTHORIZED_REQUEST)))
             return await func(request, *args, **kwargs)
 
         return wrapper
@@ -104,7 +106,7 @@ class Auth:
                     "authorization" not in request.headers
                     or not request.headers["authorization"]
             ):
-                return UnauthenticatedException(message=ErrorMessage.AUTH_HEADER_ERROR)
+                return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content=jsonable_encoder(UnauthenticatedException(message=ErrorMessage.AUTH_HEADER_ERROR)))
             if config.env != "local":
                 # Temp Expire Token Check
                 token = request.headers["authorization"]
@@ -123,9 +125,9 @@ class Auth:
             user_details = await UserController.get_user_by_email(email=email)
 
             if not user_details.data or user_details.data.status != UserStatusConstant.Active:
-                return UnauthenticatedException(message=ErrorMessage.USER_ONBOARDING_ERROR)
+                return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content=jsonable_encoder(UnauthenticatedException(message=ErrorMessage.USER_ONBOARDING_ERROR)))
             if not user_details.data.is_admin:
-                return UnauthenticatedException(message=ErrorMessage.USER_ONBOARDING_ERROR)
+                return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content=jsonable_encoder(UnauthenticatedException(message=ErrorMessage.USER_ONBOARDING_ERROR)))
             user_details_context.set(user_details.data)
             return await func(request, *args, **kwargs)
 
