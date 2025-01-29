@@ -35,7 +35,7 @@ class CategoryController:
         else:
             result = [CategoryAddOutBound(**category.__dict__) for category in data]
 
-        return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(message="success", data=result)))
+        return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(data=result)))
 
     @classmethod
     async def delete_category(cls, _id: int):
