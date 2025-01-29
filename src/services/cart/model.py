@@ -22,7 +22,7 @@ class CartModel:
         return obj
 
     @classmethod
-    def read_items(cls):
+    def read_items(cls, _id: int = None, user_id: int = None, page: int = 1, size: int = 10):
         """method to get all cart items"""
 
         rows = db.query(CartSchema)

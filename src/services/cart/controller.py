@@ -7,9 +7,10 @@ from src.services.cart.serializer import (
     CartInBound,
     CartOutBound,
     CartMultiFinalOutBound,
-
 )
-
+from fastapi.responses import JSONResponse
+from fastapi import status
+from fastapi.encoders import jsonable_encoder
 
 class CartController:
     """user controller class"""
@@ -26,8 +27,10 @@ class CartController:
         if not product:
             raise EntityException(message=ErrorMessage.INVALID_ID.format("product"))
         
+        cart = CartModel.get()
         cart = CartModel.create(**payload.__dict__)
-        return CartOutBound(id=cart.id, user_id=user.id, product=product.__dict__)
+        cartitem = CartOutBound(id=cart.id, user_id=user.id, product=product.__dict__)
+        return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(SuccessMessageOutbound(data=cartitem)))
 
     @classmethod
     async def read_all_items(cls):
@@ -38,7 +41,7 @@ class CartController:
             product = ProductModel.get_product(_id=cart_item.product_id)
             response.append(CartOutBound(id=cart.id, user_id=cart_item.user_id, product=product.__dict__))
 
-        return CartMultiFinalOutBound(data=response)
+        return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CartMultiFinalOutBound(data=response)))
 
     @classmethod
     async def remove_cart_item(cls, _id: int):

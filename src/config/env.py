@@ -22,12 +22,12 @@ class AppDBConfig(DBConfig):
     db_host: str = os.getenv("DB_HOST", "localhost:5432")
     db_name: str = os.getenv("DB_NAME", "app-web")
     db_username: str = os.getenv("DB_USERNAME", "postgres")
-    db_password: str = os.getenv("DB_PASSWORD", "root")
+    db_password: str = os.getenv("DB_PASSWORD", "admin")
 
 
 class BaseConfig(BaseSettings):
     """Base config"""
-    env: str = os.getenv("APP_ENV", "local")
+    env: str = os.getenv("APP_ENV", "")
     db_app: DBConfig = AppDBConfig()
     redis_port: int = os.getenv("BROKER_PORT", 6379)
     redis_host: str = os.getenv("BROKER_HOST", "localhost")
