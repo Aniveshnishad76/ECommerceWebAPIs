@@ -1,12 +1,12 @@
 """category controller file"""
+from fastapi.responses import JSONResponse
+from fastapi import status
+from fastapi.encoders import jsonable_encoder
 from src.config.constants import CategoriesStatusConstant
 from src.config.error_constants import ErrorMessage
 from src.services.category.model import CategoryModel
 from src.services.category.serializers import CategoryAddInBound, CategoryAddOutBound, CategoryUpdateInBound
 from src.utils.common_serializers import CommonMessageOutbound
-from fastapi.responses import JSONResponse
-from fastapi import status
-from fastapi.encoders import jsonable_encoder
 
 
 class CategoryController:

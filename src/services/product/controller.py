@@ -1,4 +1,7 @@
 """product controller file"""
+from fastapi.responses import JSONResponse
+from fastapi import status
+from fastapi.encoders import jsonable_encoder
 from src.config.constants import ProductStatusConstant
 from src.config.error_constants import ErrorMessage
 from src.services.category.model import CategoryModel
@@ -6,9 +9,6 @@ from src.services.category.serializers import CategoryAddOutBound
 from src.services.product.model import ProductModel
 from src.services.product.serializers import ProductOutBound, ProductInBound, ProductUpdateInBound
 from src.utils.common_serializers import CommonMessageOutbound
-from fastapi.responses import JSONResponse
-from fastapi import status
-from fastapi.encoders import jsonable_encoder
 
 class ProductController:
 
