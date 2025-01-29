@@ -32,8 +32,8 @@ class BaseConfig(BaseSettings):
     redis_port: int = os.getenv("BROKER_PORT", 6379)
     redis_host: str = os.getenv("BROKER_HOST", "localhost")
     redis_db: int = 13
-    default_email: str = os.getenv("DEFAULT_EMAIL", "anivesh.nishad76@gmail.com")
-    jwt_secret: str = os.getenv("JWT_SECRET", "my_str")
+    default_email: str = os.getenv("DEFAULT_EMAIL", "anivesh.nishad@gmail.com")
+    jwt_secret: str = os.getenv("JWT_SECRET", "5cbd8f1a156a0551a3fa035b978c7ff142fd945576f0436df17408b5d470a0d8")
     jwt_algorithm: str = os.getenv("JWT_ALGORITHM", "HS256")
 
 

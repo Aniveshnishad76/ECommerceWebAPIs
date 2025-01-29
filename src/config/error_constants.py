@@ -14,3 +14,12 @@ class ErrorMessage:
     INVALID_TOKEN = "Invalid token!"
     USER_ONBOARDING_ERROR = "User onboarding failed!"
     UNAUTHORIZED_REQUEST = "Unauthorized!"
+    INVALID_CREDENTIAL = "Invalid Credential!"
+    LOGIN_SUCCESSFULLY = "Login Successfully!"
+    CREATED_SUCCESSFULLY = 'Created Successfully'
+    FETCH_SUCCESSFULLY = 'Data Fetched Successfully'
+    RECORD_DELETED_SUCCESSFULLY = 'Record deleted successfully'
+    RECORD_UPDATED_SUCCESSFULLY = 'Record updated successfully'
+    MISSING_FILED_TO_UPDATE = "Missing field to update!"
+    STOCKS_NOT_AVAILABLE = "Stocks not available!"
+    USERNAME_ALREADY_EXISTS = "Username already exists!"
