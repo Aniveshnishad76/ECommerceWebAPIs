@@ -24,9 +24,14 @@ class CartModel:
     @classmethod
     def read_items(cls, _id: int = None, user_id: int = None, page: int = 1, size: int = 10):
         """method to get all cart items"""
-
-        rows = db.query(CartSchema)
-        rows = select_all(rows)
+        rows = db.query(UserSchema).filter(UserSchema.status == UserStatusConstant.Active)
+        if _id:
+            rows = db.query(CartSchema).filter(id == _id)
+        if user_id:
+            rows = db.query(CartSchema).filter(CartSchema.user_id == user_id)
+        else:
+            rows = db.query(CartSchema)
+            rows = select_all(rows)
         return rows
 
     @classmethod
