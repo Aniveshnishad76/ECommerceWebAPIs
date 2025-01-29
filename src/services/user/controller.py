@@ -10,6 +10,8 @@ from src.services.user.serializer import (
     UserDetailsOutBound,
     UserAppOutBound, UserProfileInbound
 )
+from fastapi import status
+from fastapi.responses import JSONResponse
 from src.utils.common import generate_jwt_token, verify_password, hash_password
 from src.utils.common_serializers import CommonMessageOutbound
 
@@ -23,12 +25,13 @@ class UserController:
         """login function"""
         user = UserModel.get_user(email=payload.email)
         if not user:
-            return CommonMessageOutbound(message=ErrorMessage.INVALID_USER)
+            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=CommonMessageOutbound(message=ErrorMessage.INVALID_USER).__dict__)
         if not verify_password(password=payload.password, hashed_password=user.password_hash):
-            return CommonMessageOutbound(message=ErrorMessage.PASSWORD_DO_NOT_MATCH)
+            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST,content=CommonMessageOutbound(message=ErrorMessage.PASSWORD_DO_NOT_MATCH).__dict__)
         token = generate_jwt_token(email=payload.email)
         data = UserLoginOutBound(username=user.username, email=user.email, token=token)
-        return CommonMessageOutbound(data=data.__dict__)
+        data = CommonMessageOutbound(data=data.__dict__)
+        return JSONResponse(status_code=status.HTTP_200_OK, content=data.__dict__)
 
     @classmethod
     async def register(cls, payload: UserRegisterInbound):
@@ -36,7 +39,11 @@ class UserController:
         if payload.email:
             user = UserModel.get_user(email=payload.email)
             if user:
-                return CommonMessageOutbound(message=ErrorMessage.USER_ALREADY_EXISTS)
+                return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=CommonMessageOutbound(message=ErrorMessage.USER_ALREADY_EXISTS).__dict__)
+        if payload.username:
+            user = UserModel.get_user(user_name=payload.username)
+            if user:
+                return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=CommonMessageOutbound(message=ErrorMessage.USER_ALREADY_EXISTS).__dict__)
         payload.password  = hash_password(payload.password)
         payload = payload.dict()
         if payload.get('password') and payload['password']:
@@ -59,8 +66,8 @@ class UserController:
             password = hash_password(new_password)
             UserModel.patch(_id=user.id, **{"password_hash": password})
             updated_data = await cls.get_by_id(_id=user.id)
-            return CommonMessageOutbound(message=ErrorMessage.RECORD_UPDATED_SUCCESSFULLY, data=updated_data.data.__dict__)
-        return CommonMessageOutbound(message=ErrorMessage.PASSWORD_DO_NOT_MATCH)
+            return JSONResponse(status_code=status.HTTP_200_OK, content=CommonMessageOutbound(message=ErrorMessage.RECORD_UPDATED_SUCCESSFULLY, data=updated_data.__dict__).__dict__)
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=CommonMessageOutbound(message=ErrorMessage.PASSWORD_DO_NOT_MATCH).__dict__)
 
     @classmethod
     async def profile(cls, payload: UserProfileInbound):
@@ -69,18 +76,18 @@ class UserController:
         if payload.username:
             user = UserModel.get_user(user_name=payload.username)
             if user:
-                return CommonMessageOutbound(message=ErrorMessage.USERNAME_ALREADY_EXISTS)
+                return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=CommonMessageOutbound(message=ErrorMessage.USERNAME_ALREADY_EXISTS).__dict__)
         payload_dict = payload.dict(exclude_none=True, exclude_unset=True)
         UserModel.patch(_id=user_data.id, **payload_dict)
         updated_data = await cls.get_by_id(_id=user_data.id)
-        return CommonMessageOutbound(message=ErrorMessage.RECORD_UPDATED_SUCCESSFULLY, data=updated_data.data.__dict__)
+        return JSONResponse(status_code=status.HTTP_200_OK, content=CommonMessageOutbound(message=ErrorMessage.RECORD_UPDATED_SUCCESSFULLY, data=updated_data.data.__dict__).__dict__)
 
     @classmethod
     async def get_by_id(cls, _id: int):
         """Get user by id"""
         user = UserModel.get_user(_id=_id)
         if not user:
-            return CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)
+            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND).__dict__)
         return UserFinalOutbound(
             data=UserDetailsOutBound(
                 id=user.id,
@@ -99,7 +106,7 @@ class UserController:
         """Get user by email"""
         user = UserModel.get_user(email=email)
         if not user:
-            return CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)
+            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND).__dict__)
         return UserFinalOutbound(
             data=UserDetailsOutBound(
                 id=user.id,
