@@ -6,7 +6,9 @@ from src.services.category.serializers import CategoryAddOutBound
 from src.services.product.model import ProductModel
 from src.services.product.serializers import ProductOutBound, ProductInBound, ProductUpdateInBound
 from src.utils.common_serializers import CommonMessageOutbound
-
+from fastapi.responses import JSONResponse
+from fastapi import status
+from fastapi.encoders import jsonable_encoder
 
 class ProductController:
 
@@ -17,7 +19,7 @@ class ProductController:
         """category get by id function"""
         data = ProductModel.get(_id=_id, category_id=category_id, page=page, size=size)
         if not data:
-            return CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)
+            return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)))
         if _id:
             result = ProductOutBound(
                 id=data.id,
@@ -48,7 +50,7 @@ class ProductController:
                     ),
                 )
                 response.append(result.__dict__)
-            return CommonMessageOutbound(data=response)
+            return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(data=response)))
 
     @classmethod
     async def create_product(cls, payload: ProductInBound):
@@ -58,7 +60,7 @@ class ProductController:
         if payload.category_id:
             category = CategoryModel.get(_id=payload.category_id)
             if not category:
-                return CommonMessageOutbound(message=ErrorMessage.INVALID_ID.format("category"))
+                return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.INVALID_ID.format("category"))))
         if category:
             category = CategoryAddOutBound(
                 id=category.id,
@@ -74,7 +76,7 @@ class ProductController:
             stock=product.stock,
             category=category
         )
-        return CommonMessageOutbound(message=ErrorMessage.CREATED_SUCCESSFULLY, data=data.__dict__)
+        return JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.CREATED_SUCCESSFULLY, data=data.__dict__)))
 
     @classmethod
     async def product_update(cls, payload: ProductUpdateInBound):
@@ -83,10 +85,10 @@ class ProductController:
         if payload.category_id:
             category = CategoryModel.get(_id=payload.category_id)
             if not category:
-                return CommonMessageOutbound(message=ErrorMessage.INVALID_ID.format("category"))
+                return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.INVALID_ID.format("category"))))
         product = ProductModel.get(_id=payload.id)
         if not product:
-            return CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)
+            return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)))
         payload_dict = payload.dict(exclude_unset=True, exclude_none=True)
         product = ProductModel.patch(_id=payload.id, **payload_dict)
         if category:
@@ -103,7 +105,7 @@ class ProductController:
             stock=product.stock,
             category=category
         )
-        return CommonMessageOutbound(message=ErrorMessage.RECORD_UPDATED_SUCCESSFULLY, data=data.__dict__)
+        return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_UPDATED_SUCCESSFULLY, data=data.__dict__)))
 
     @classmethod
     async def delete_product(cls, _id: int):
@@ -111,6 +113,6 @@ class ProductController:
 
         product = ProductModel.get(_id=_id)
         if not product:
-            return CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)
+            return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)))
         ProductModel.patch(_id=_id, **{"status": ProductStatusConstant.Inactive})
-        return CommonMessageOutbound(message=ErrorMessage.RECORD_DELETED_SUCCESSFULLY)
+        return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_DELETED_SUCCESSFULLY)))
