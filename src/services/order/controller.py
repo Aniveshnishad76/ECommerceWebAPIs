@@ -13,6 +13,7 @@ from src.services.product.model import ProductModel
 from src.services.product.serializers import ProductOutBound
 from src.services.user.controller import user_details_context
 from src.utils.common_serializers import CommonMessageOutbound
+from src.services.cart.model import CartModel
 
 
 class OrdersController:
@@ -25,7 +26,7 @@ class OrdersController:
         total_amount = 0
         all_order_items = []
         order = OrderSaveInbound(**{"user_id": user_data.id, "total": total_amount})
-        order = OrderModel.create(**order.__dict__)
+        order = OrderModel.create(**jsonable_encoder(order))
         for item in payload.items or []:
             product_data = await ProductController.get_product(_id=item.product_id)
             if not product_data.data:
@@ -36,7 +37,10 @@ class OrdersController:
                 return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.STOCKS_NOT_AVAILABLE)))
             total_amount += product_data.data.get("price") * item.quantity
             order_item = OrderItemFinalInbound(order_id=order.id, product_id=item.product_id, quantity=item.quantity, price=product_data.data.get("price"))
-            order_item = OrderItemsModel.create(**order_item.__dict__)
+            order_item = OrderItemsModel.create(**jsonable_encoder(order_item))
+            cart = CartModel.read_items(user_id=user_data.id, product_id=product_data.id)
+            if cart:
+                CartModel.delete_item(cart.id)
             all_order_items.append(OrderItemOutbound(
                 id=order_item.id,
                 product=ProductOutBound(**product_data.data),
@@ -54,7 +58,7 @@ class OrdersController:
             items=all_order_items,
             status=order.status
         )
-        return JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.CREATED_SUCCESSFULLY, data=result.__dict__)))
+        return JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.CREATED_SUCCESSFULLY, data=jsonable_encoder(result))))
 
     @classmethod
     async def update_orders(cls, payload: UpdateOrderInbound):
@@ -76,7 +80,7 @@ class OrdersController:
                 return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.STOCKS_NOT_AVAILABLE)))
             total_amount += product_data.data.get("price", 0) * item.quantity
             order_item = OrderItemFinalInbound(order_id=order.id, product_id=product_data.data.get("id"), quantity=item.quantity,price=product_data.data.get("price", 0))
-            order_item = OrderItemsModel.patch(_id=item.id, **order_item.__dict__)
+            order_item = OrderItemsModel.patch(_id=item.id, **jsonable_encoder(order_item))
             all_order_items.append(OrderItemOutbound(
                 id=order_item.id,
                 product=product_data.data,
@@ -94,7 +98,7 @@ class OrdersController:
             items=all_order_items,
             status=order.status
         )
-        return JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.CREATED_SUCCESSFULLY, data=result.__dict__)))
+        return JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.CREATED_SUCCESSFULLY, data=jsonable_encoder(result))))
 
     @classmethod
     async def get(cls, _id: int = None, page: int = 1, size: int = 10):
@@ -124,7 +128,7 @@ class OrdersController:
                 status=order.status,
                 items=items_data
                 )
-            return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.FETCH_SUCCESSFULLY, data=data.__dict__)))
+            return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.FETCH_SUCCESSFULLY, data=jsonable_encoder(data))))
         else:
             order_response = []
             for order_ in order or []:
@@ -148,7 +152,7 @@ class OrdersController:
                         status=order_.status,
                         items=items_data
                     )
-                order_response.append(order_result.__dict__)
+                order_response.append(jsonable_encoder(order_result))
             return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.FETCH_SUCCESSFULLY, data=order_response)))
 
     @classmethod
