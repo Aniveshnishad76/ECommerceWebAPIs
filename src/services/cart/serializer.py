@@ -1,17 +1,18 @@
 """serializers file """
 from pydantic import BaseModel
 from fastapi import status
+from src.services.product.serializers import ProductOutBound
 
 
-class ProductOutBound(BaseModel):
-    """Product details out bound"""
+# class ProductOutBound(BaseModel):
+#     """Product details out bound"""
 
-    id: int
-    name: str
-    description: str
-    price: float
-    stock: int
-    category_id: int
+#     id: int
+#     name: str
+#     description: str
+#     price: float
+#     stock: int
+#     category_id: int
 
 class CartOutBound(BaseModel):
     """user app bound model"""
