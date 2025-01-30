@@ -33,7 +33,7 @@ class ProductController:
                     description=data.category_description
                 ),
             )
-            return CommonMessageOutbound(data=result.__dict__)
+            return CommonMessageOutbound(data=jsonable_encoder(result))
         else:
             response = []
             for product in data or []:
@@ -49,7 +49,7 @@ class ProductController:
                         description=product.category_description
                     ),
                 )
-                response.append(result.__dict__)
+                response.append(jsonable_encoder(result))
             return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(data=response)))
 
     @classmethod
@@ -67,7 +67,7 @@ class ProductController:
                 name=category.name,
                 description=category.description
             )
-        product = ProductModel.create(**payload.__dict__)
+        product = ProductModel.create(**jsonable_encoder(payload))
         data = ProductOutBound(
             id=product.id,
             name=product.name,
@@ -76,7 +76,7 @@ class ProductController:
             stock=product.stock,
             category=category
         )
-        return JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.CREATED_SUCCESSFULLY, data=data.__dict__)))
+        return JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.CREATED_SUCCESSFULLY, data=jsonable_encoder(data))))
 
     @classmethod
     async def product_update(cls, payload: ProductUpdateInBound):
@@ -105,7 +105,7 @@ class ProductController:
             stock=product.stock,
             category=category
         )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_UPDATED_SUCCESSFULLY, data=data.__dict__)))
+        return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_UPDATED_SUCCESSFULLY, data=jsonable_encoder(data))))
 
     @classmethod
     async def delete_product(cls, _id: int):

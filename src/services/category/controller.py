@@ -18,9 +18,9 @@ class CategoryController:
             data = CategoryModel.get(name=payload.name)
             if data:
                 return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_ALREADY_EXISTS.format("Category"))))
-        category = CategoryModel.create(**payload.__dict__)
-        data = CategoryAddOutBound(**category.__dict__)
-        response = JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.CREATED_SUCCESSFULLY, data=data.__dict__)))
+        category = CategoryModel.create(**jsonable_encoder(payload))
+        data = CategoryAddOutBound(**jsonable_encoder(category))
+        response = JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.CREATED_SUCCESSFULLY, data=jsonable_encoder(data))))
         return response
 
     @classmethod
@@ -31,9 +31,9 @@ class CategoryController:
         if not data:
             return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)))
         if _id:
-            result = CategoryAddOutBound(**data.__dict__)
+            result = CategoryAddOutBound(**jsonable_encoder(data))
         else:
-            result = [CategoryAddOutBound(**category.__dict__) for category in data]
+            result = [CategoryAddOutBound(**jsonable_encoder(category)) for category in data]
 
         return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(data=result)))
 
@@ -58,5 +58,5 @@ class CategoryController:
             return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)))
 
         data = CategoryModel.patch(_id=payload.id, **payload_dict)
-        data = CategoryAddOutBound(**data.__dict__)
-        return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_UPDATED_SUCCESSFULLY, data=data.__dict__)))
+        data = CategoryAddOutBound(**jsonable_encoder(data))
+        return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_UPDATED_SUCCESSFULLY, data=jsonable_encoder(data))))
