@@ -23,3 +23,5 @@ class ErrorMessage:
     MISSING_FILED_TO_UPDATE = "Missing field to update!"
     STOCKS_NOT_AVAILABLE = "Stocks not available!"
     USERNAME_ALREADY_EXISTS = "Username already exists!"
+    CUSTOM_MESSAGE = "{}"
+    FAILED_TO_PARSE_VALUE = "Failed to parse value {}!"

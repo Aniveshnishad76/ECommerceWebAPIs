@@ -35,6 +35,10 @@ class BaseConfig(BaseSettings):
     default_email: str = os.getenv("DEFAULT_EMAIL", "anivesh.nishad@gmail.com")
     jwt_secret: str = os.getenv("JWT_SECRET", "5cbd8f1a156a0551a3fa035b978c7ff142fd945576f0436df17408b5d470a0d8")
     jwt_algorithm: str = os.getenv("JWT_ALGORITHM", "HS256")
+    aws_access_key_id: str = os.getenv("AWS_ACCESS_KEY_ID", "")
+    aws_secret_access_key: str = os.getenv("AWS_SECRET_ACCESS_KEY", "")
+    aws_region: str = os.getenv("AWS_REGION", "us-east-2")
+    aws_s3_bucket_name: str = os.getenv("AWS_S3_BUCKET_NAME", "e-commerce-application")
 
 
 @lru_cache()
