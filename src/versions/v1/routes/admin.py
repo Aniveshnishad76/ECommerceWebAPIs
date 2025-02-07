@@ -1,6 +1,6 @@
 """Admin Routes File"""
-
-from fastapi import APIRouter, Request
+from typing import List
+from fastapi import APIRouter, Request, UploadFile, File, Depends
 from src.services.admin.controller import AdminController
 from src.services.admin.serializers import AdminLoginInbound
 from src.services.category.controller import CategoryController
@@ -59,11 +59,15 @@ async def create_category(request: Request, payload: CategoryAddInBound):
 @router.post("/product", tags=["Admin POST"])
 @Auth.authenticate_admin
 @Auth.authorize_admin
-async def create_product(request: Request, payload: ProductInBound):
+async def create_product(
+        request: Request,
+        payload: ProductInBound = Depends(ProductInBound.as_form),
+        image: List[UploadFile] = File(...)
+):
 
     """route for create product"""
 
-    return await ProductController.create_product(payload=payload)
+    return await ProductController.create_product(payload=payload, image=image)
 
 @router.delete("/category", tags=["Admin DELETE"])
 @Auth.authenticate_admin
@@ -93,11 +97,15 @@ async def update_category(request: Request, payload: CategoryUpdateInBound):
 @router.patch("/product", tags=["Admin PATCH"])
 @Auth.authenticate_admin
 @Auth.authorize_admin
-async def update_product(request: Request, payload: ProductUpdateInBound):
+async def update_product(
+        request: Request,
+        payload: ProductUpdateInBound = Depends(ProductUpdateInBound.as_form),
+        image: List[UploadFile] = File(None)
+):
 
     """route for update product"""
 
-    return await ProductController.product_update(payload=payload)
+    return await ProductController.product_update(payload=payload, image=image)
 
 @router.delete("/user", tags=["Admin DELETE"])
 @Auth.authenticate_admin

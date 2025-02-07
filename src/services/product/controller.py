@@ -1,13 +1,16 @@
 """product controller file"""
+from typing import List
 from fastapi.responses import JSONResponse
-from fastapi import status
+from fastapi import status, UploadFile, File
 from fastapi.encoders import jsonable_encoder
-from src.config.constants import ProductStatusConstant
+from src.config.constants import ProductStatusConstant, S3Constants
 from src.config.error_constants import ErrorMessage
+from src.lib.s3 import Boto
 from src.services.category.model import CategoryModel
 from src.services.category.serializers import CategoryAddOutBound
 from src.services.product.model import ProductModel
 from src.services.product.serializers import ProductOutBound, ProductInBound, ProductUpdateInBound
+from src.utils.common import generate_attachment_name_and_format
 from src.utils.common_serializers import CommonMessageOutbound
 
 class ProductController:
@@ -53,7 +56,7 @@ class ProductController:
             return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(data=response)))
 
     @classmethod
-    async def create_product(cls, payload: ProductInBound):
+    async def create_product(cls, payload: ProductInBound, image: List[UploadFile] = File(...)):
         """product create function"""
 
         category = None
@@ -67,19 +70,30 @@ class ProductController:
                 name=category.name,
                 description=category.description
             )
-        product = ProductModel.create(**payload.__dict__)
+        boto_client = Boto()
+        image_url_list = []
+        for file in image:
+            attachment_name, attachment_format = generate_attachment_name_and_format(file)
+            path = f"{S3Constants.Product_Image}/{attachment_name}.{attachment_format}"
+            image_url = await boto_client.upload_to_s3(attachment=file, path=path)
+            image_url_list.append(image_url)
+
+        payload = payload.__dict__
+        payload["image_urls"] = {"urls": image_url_list}
+        product = ProductModel.create(**payload)
         data = ProductOutBound(
             id=product.id,
             name=product.name,
             description=product.description,
             price=product.price,
             stock=product.stock,
-            category=category
+            category=category,
+            image_urls=product.image_urls.get("urls", []) if product.image_urls else [],
         )
         return JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.CREATED_SUCCESSFULLY, data=data.__dict__)))
 
     @classmethod
-    async def product_update(cls, payload: ProductUpdateInBound):
+    async def product_update(cls, payload: ProductUpdateInBound, image: List[UploadFile] = File(None)):
         """product update function"""
         category = None
         if payload.category_id:
@@ -90,6 +104,15 @@ class ProductController:
         if not product:
             return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)))
         payload_dict = payload.dict(exclude_unset=True, exclude_none=True)
+        if image:
+            boto_client = Boto()
+            image_url_list = []
+            for file in image or []:
+                attachment_name, attachment_format = generate_attachment_name_and_format(file)
+                path = f"{S3Constants.Product_Image}/{attachment_name}.{attachment_format}"
+                image_url = await boto_client.upload_to_s3(attachment=file, path=path)
+                image_url_list.append(image_url)
+            payload_dict["image_urls"] = {"urls": image_url_list}
         product = ProductModel.patch(_id=payload.id, **payload_dict)
         if category:
             category = CategoryAddOutBound(
@@ -103,7 +126,8 @@ class ProductController:
             description=product.description,
             price=product.price,
             stock=product.stock,
-            category=category
+            category=category,
+            image_urls=product.image_urls.get("urls", []) if product.image_urls else [],
         )
         return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_UPDATED_SUCCESSFULLY, data=data.__dict__)))
 

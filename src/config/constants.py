@@ -60,3 +60,8 @@ class PaymentsMethodsConstant:
     PhonePay = 3
     DebitCart = 4
     CreditCart = 5
+
+
+class S3Constants:
+    """S3 Constants"""
+    Product_Image = "product_images"

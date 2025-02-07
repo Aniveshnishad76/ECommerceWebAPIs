@@ -17,6 +17,7 @@ class ProductSchema(Base):
     price                     = Column(DOUBLE_PRECISION, nullable=False)
     stock                     = Column(BIGINT, default=0)
     category_id               = Column(BIGINT, default=0)
+    image_urls                = Column(JSONB, default= lambda: {})
     meta_data                 = Column(JSONB, default= lambda: {})
     created_at                = Column(TIMESTAMP)
     updated_at                = Column(TIMESTAMP)

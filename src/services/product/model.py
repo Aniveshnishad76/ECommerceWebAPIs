@@ -42,6 +42,7 @@ class ProductModel:
             ProductSchema.status,
             ProductSchema.updated_at,
             ProductSchema.created_at,
+            ProductSchema.image_urls,
             CategorySchema.id.label("category_id"),
             CategorySchema.name.label("category_name"),
             CategorySchema.status.label("category_status"),
