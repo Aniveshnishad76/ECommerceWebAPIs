@@ -1,6 +1,7 @@
 """Admin Routes File"""
 from typing import List
 from fastapi import APIRouter, Request, UploadFile, File, Depends
+from src.lib.sentry import sentry_wrapper
 from src.services.admin.controller import AdminController
 from src.services.admin.serializers import AdminLoginInbound
 from src.services.category.controller import CategoryController
@@ -11,8 +12,21 @@ from src.utils.auth import Auth
 
 router = APIRouter()
 
+post_login                  = sentry_wrapper("Login - Admin post")
+category_list               = sentry_wrapper("Category - Admin get")
+product_list                = sentry_wrapper("Product - Admin get")
+profile_get                 = sentry_wrapper("Profile - Admin get")
+category_post               = sentry_wrapper("Category - Admin post")
+product_post                = sentry_wrapper("Product - Admin post")
+category_delete             = sentry_wrapper("Category - Admin delete")
+product_delete              = sentry_wrapper("Product - Admin delete")
+category_update             = sentry_wrapper("Category - Admin update")
+product_update              = sentry_wrapper("Product - Admin update")
+user_block                  = sentry_wrapper("User - Admin block")
+user_unblock                = sentry_wrapper("User - Admin unblock")
 
-@router.get("/category", tags=["Admin GET"])
+
+@router.get("/category", tags=["Admin GET"], dependencies=[Depends(category_list)])
 @Auth.authenticate_admin
 @Auth.authorize_admin
 async def get_category(request: Request, _id: int = None, page: int = 1, size: int = 10):
@@ -21,7 +35,7 @@ async def get_category(request: Request, _id: int = None, page: int = 1, size: i
 
     return await CategoryController.get_category(_id=_id, page=page, size=size)
 
-@router.get("/product", tags=["Admin GET"])
+@router.get("/product", tags=["Admin GET"], dependencies=[Depends(product_list)])
 @Auth.authenticate_admin
 @Auth.authorize_admin
 async def get_product(request: Request, product_id: int = None, page: int = 1, size: int = 10):
@@ -31,14 +45,14 @@ async def get_product(request: Request, product_id: int = None, page: int = 1, s
     return await ProductController.get_product(_id=product_id, page=page, size=size)
 
 
-@router.post("/login", tags=["Admin POST"])
+@router.post("/login", tags=["Admin POST"], dependencies=[Depends(post_login)])
 async def admin_login(request: Request, payload: AdminLoginInbound):
 
     """route for admin login"""
 
     return await AdminController.login(payload=payload)
 
-@router.get("/profile", tags=["Admin GET"])
+@router.get("/profile", tags=["Admin GET"], dependencies=[Depends(profile_get)])
 @Auth.authenticate_admin
 @Auth.authorize_admin
 async def get_profile(request: Request):
@@ -47,7 +61,7 @@ async def get_profile(request: Request):
 
     return await AdminController.get_profile()
 
-@router.post("/category", tags=["Admin POST"])
+@router.post("/category", tags=["Admin POST"], dependencies=[Depends(category_post)])
 @Auth.authenticate_admin
 @Auth.authorize_admin
 async def create_category(request: Request, payload: CategoryAddInBound):
@@ -56,7 +70,7 @@ async def create_category(request: Request, payload: CategoryAddInBound):
 
     return await CategoryController.create_category(payload=payload)
 
-@router.post("/product", tags=["Admin POST"])
+@router.post("/product", tags=["Admin POST"], dependencies=[Depends(product_post)])
 @Auth.authenticate_admin
 @Auth.authorize_admin
 async def create_product(
@@ -69,7 +83,7 @@ async def create_product(
 
     return await ProductController.create_product(payload=payload, image=image)
 
-@router.delete("/category", tags=["Admin DELETE"])
+@router.delete("/category", tags=["Admin DELETE"], dependencies=[Depends(category_delete)])
 @Auth.authenticate_admin
 @Auth.authorize_admin
 async def delete_category(request: Request, _id: int):
@@ -77,7 +91,7 @@ async def delete_category(request: Request, _id: int):
     """route for delete category"""
     return await CategoryController.delete_category(_id=_id)
 
-@router.delete("/product", tags=["Admin DELETE"])
+@router.delete("/product", tags=["Admin DELETE"], dependencies=[Depends(product_delete)])
 @Auth.authenticate_admin
 @Auth.authorize_admin
 async def delete_product(request: Request, _id: int):
@@ -85,7 +99,7 @@ async def delete_product(request: Request, _id: int):
     """route for delete product"""
     return await ProductController.delete_product(_id=_id)
 
-@router.patch("/category", tags=["Admin PATCH"])
+@router.patch("/category", tags=["Admin PATCH"], dependencies=[Depends(category_update)])
 @Auth.authenticate_admin
 @Auth.authorize_admin
 async def update_category(request: Request, payload: CategoryUpdateInBound):
@@ -94,7 +108,7 @@ async def update_category(request: Request, payload: CategoryUpdateInBound):
 
     return await CategoryController.category_update(payload=payload)
 
-@router.patch("/product", tags=["Admin PATCH"])
+@router.patch("/product", tags=["Admin PATCH"], dependencies=[Depends(product_update)])
 @Auth.authenticate_admin
 @Auth.authorize_admin
 async def update_product(
@@ -107,7 +121,7 @@ async def update_product(
 
     return await ProductController.product_update(payload=payload, image=image)
 
-@router.delete("/user", tags=["Admin DELETE"])
+@router.delete("/user", tags=["Admin DELETE"], dependencies=[Depends(user_block)])
 @Auth.authenticate_admin
 @Auth.authorize_admin
 async def delete_user(request: Request, user_id: int):
@@ -116,7 +130,7 @@ async def delete_user(request: Request, user_id: int):
 
     return await AdminController.delete_user(user_id=user_id)
 
-@router.patch("/user", tags=["Admin PATCH"])
+@router.patch("/user", tags=["Admin PATCH"], dependencies=[Depends(user_unblock)])
 @Auth.authenticate_admin
 @Auth.authorize_admin
 async def activate_user(request: Request, user_id: int):

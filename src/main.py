@@ -5,6 +5,7 @@ main
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 import uvicorn
+import sentry_sdk
 from src.config.constants import APP_CONTEXT_PATH, APP_CONTEXT_PATH_v2
 from src.versions.v1 import main as v1_route
 from src.versions.v1 import internal as v1_route_internal
@@ -14,6 +15,12 @@ from fastapi.middleware.gzip import GZipMiddleware
 
 config = get_settings()
 
+sentry_sdk.init(
+    dsn=config.sentry_dns,
+    send_default_pii=True,
+    traces_sample_rate=config.traces_sample_rate,
+    _experiments={"continuous_profiling_auto_start": True}
+)
 
 app = FastAPI(
     title="E-Commerce Backend API",

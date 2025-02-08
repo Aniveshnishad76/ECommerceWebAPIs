@@ -39,7 +39,8 @@ class BaseConfig(BaseSettings):
     aws_secret_access_key: str = os.getenv("AWS_SECRET_ACCESS_KEY", "")
     aws_region: str = os.getenv("AWS_REGION", "us-east-2")
     aws_s3_bucket_name: str = os.getenv("AWS_S3_BUCKET_NAME", "e-commerce-application")
-
+    sentry_dns: str = os.getenv("SENTRY_DNS", "")
+    traces_sample_rate: float = os.getenv("TRACES_SAMPLE_RATE", 1.0)
 
 @lru_cache()
 def get_settings():
