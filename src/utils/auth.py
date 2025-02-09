@@ -7,10 +7,12 @@ from fastapi.encoders import jsonable_encoder
 from src.config.error_constants import ErrorMessage
 from src.config.constants import UserStatusConstant
 from src.exceptions.errors.generic import UnauthenticatedException
+from src.lib.redis import redis_cache
 from src.services.user.controller import UserController, user_details_context
 from src.config.redis_constants import RedisKey, RedisExp
 # from src.lib.redis import redis_cache
 from src.config.env import get_settings
+from src.utils.common import decode_jwt_token
 
 config = get_settings()
 
@@ -28,11 +30,11 @@ class Auth:
                 if config.env != 'local':
                     token = request.headers["authorization"]
                     # Set Temp Expire Token
-                    # await redis_cache.set(
-                    #     key=RedisKey.USER_EXPIRE_SESSION_TOKEN.format(token=token),
-                    #     value=1,
-                    #     ex=RedisExp.USER_EXPIRE_SESSION_TOKEN,
-                    # )
+                    await redis_cache.set(
+                        key=RedisKey.USER_EXPIRE_SESSION_TOKEN.format(token=token),
+                        value=1,
+                        ex=RedisExp.USER_EXPIRE_SESSION_TOKEN,
+                    )
             except Exception as e:
                 pass
             return await func(request, *args, **kwargs)
@@ -51,15 +53,11 @@ class Auth:
             if config.env != "local":
                 # Temp Expire Token Check
                 token = request.headers["authorization"]
-                # exp_token = await redis_cache.get(key=RedisKey.USER_EXPIRE_SESSION_TOKEN.format(token=token))
-                # if exp_token:
-                #     raise UnauthenticatedException(message=ErrorMessage.INVALID_TOKEN)
+                exp_token = await redis_cache.get(key=RedisKey.USER_EXPIRE_SESSION_TOKEN.format(token=token))
+                if exp_token:
+                    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=jsonable_encoder(UnauthenticatedException(message=ErrorMessage.INVALID_TOKEN)))
 
-                email = jwt.decode(
-                    token,
-                    algorithms="RS256",
-                    options={"verify_signature": False},
-                )["email"]
+                email = decode_jwt_token(token)["email"]
                 email = email.lower()
             else:
                 email = config.default_email
@@ -110,15 +108,10 @@ class Auth:
             if config.env != "local":
                 # Temp Expire Token Check
                 token = request.headers["authorization"]
-                # exp_token = await redis_cache.get(key=RedisKey.USER_EXPIRE_SESSION_TOKEN.format(token=token))
-                # if exp_token:
-                #     raise UnauthenticatedException(message=ErrorMessage.INVALID_TOKEN)
-
-                email = jwt.decode(
-                    token,
-                    algorithms="RS256",
-                    options={"verify_signature": False},
-                )["email"]
+                exp_token = await redis_cache.get(key=RedisKey.USER_EXPIRE_SESSION_TOKEN.format(token=token))
+                if exp_token:
+                    return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content=jsonable_encoder(UnauthenticatedException(message=ErrorMessage.INVALID_TOKEN)))
+                email = decode_jwt_token(token)["email"]
                 email = email.lower()
             else:
                 email = config.default_email

@@ -24,6 +24,7 @@ category_update             = sentry_wrapper("Category - Admin update")
 product_update              = sentry_wrapper("Product - Admin update")
 user_block                  = sentry_wrapper("User - Admin block")
 user_unblock                = sentry_wrapper("User - Admin unblock")
+logout                      = sentry_wrapper("Logout - Admin logout")
 
 
 @router.get("/category", tags=["Admin GET"], dependencies=[Depends(category_list)])
@@ -136,3 +137,11 @@ async def delete_user(request: Request, user_id: int):
 async def activate_user(request: Request, user_id: int):
     """route for activate user"""
     return await AdminController.activate_user(user_id=user_id)
+
+@router.post("/logout", tags=["Admin POST"], dependencies=[Depends(logout)])
+@Auth.authenticate_admin
+@Auth.authorize_admin
+@Auth.authenticate_user_logout
+async def logout(request: Request):
+    """route for logout"""
+    return await AdminController.logout()

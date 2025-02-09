@@ -17,6 +17,7 @@ user_change_password            = sentry_wrapper("User - change password")
 user_update                     = sentry_wrapper("User - update")
 user_category_get               = sentry_wrapper("User - category get")
 user_product_get                = sentry_wrapper("User - product get")
+user_logout                     = sentry_wrapper("User - logout")
 
 
 @router.post("/login", tags=["User POST"], dependencies=[Depends(user_login)])
@@ -45,13 +46,11 @@ async def change_password(request: Request, old_password: str, new_password: str
 
 @router.patch("/", tags=["User PATCH"], dependencies=[Depends(user_update)])
 @Auth.authenticate_user
-@Auth.authenticate_user
 async def profile_update(request: Request, payload: UserProfileInbound):
     """profile update route"""
     return await UserController.profile(payload=payload)
 
 @router.get("/category", tags=["User GET"], dependencies=[Depends(user_category_get)])
-@Auth.authenticate_user
 @Auth.authenticate_user
 async def get_category(request: Request, _id: int = None, page: int = 1, size: int = 10):
 
@@ -66,3 +65,10 @@ async def get_product(request: Request, product_id: int = None, category_id: int
     """route for fetch product"""
 
     return await ProductController.get_product(_id=product_id, category_id=category_id, page=page, size=size)
+
+@router.post("/logout", tags=["User POST"], dependencies=[Depends(user_logout)])
+@Auth.authenticate_user
+@Auth.authenticate_user_logout
+async def logout(request: Request):
+    """logout route"""
+    return await UserController.logout()
