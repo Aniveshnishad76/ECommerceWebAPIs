@@ -50,3 +50,8 @@ class AdminController:
             return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)))
         UserModel.patch(_id=user_id, **{"status": UserStatusConstant.Active})
         return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_UPDATED_SUCCESSFULLY)))
+
+    @classmethod
+    async def logout(cls):
+        """logout function"""
+        return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder((CommonMessageOutbound(message=ErrorMessage.LOGOUT_SUCCESSFULLY))))

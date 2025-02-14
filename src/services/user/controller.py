@@ -120,3 +120,8 @@ class UserController:
                 is_admin=user.is_admin,
             )
         )
+
+    @classmethod
+    async def logout(cls):
+        """logout function"""
+        return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder((CommonMessageOutbound(message=ErrorMessage.LOGOUT_SUCCESSFULLY))))
