@@ -1,7 +1,7 @@
 """order serializers file"""
 from datetime import datetime
 from typing import List
-from pydantic import BaseModel, conint, constr, confloat, conlist
+from pydantic import BaseModel, conint, confloat, conlist
 from src.services.order_items.serializers import OrderItemInbound, OrderItemOutbound, UpdateOrderItemOutbound
 from src.services.user.serializer import UserAppOutBound
 

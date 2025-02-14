@@ -67,7 +67,9 @@ These instructions will get you a copy of the project up and running on your loc
   celery -A src.tasks.tasks beat --loglevel=info
   celery -A src.tasks.tasks worker --loglevel=info
   ```
-  
+
+## Note: Make sure redis is installed and run in your system
+
 ## ⛏️ Built Using <a name = "built_using"></a>
 
 - [Postgres](https://www.postgresql.org/) - Database

@@ -23,11 +23,13 @@ def decode_jwt_token(token: str):
     return email
 
 def hash_password(password: str):
+    """hash password"""
     salt = bcrypt.gensalt()
     hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
     return hashed.decode('utf-8')
 
 def verify_password(password: str, hashed_password: str):
+    """varify password"""
     return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))
 
 def generate_attachment_name_and_format(image):

@@ -36,7 +36,7 @@ class ProductController:
                     description=data.category_description
                 ),
             )
-            return CommonMessageOutbound(data=result.__dict__)
+            return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(data=result.__dict__)))
         else:
             response = []
             for product in data or []:
