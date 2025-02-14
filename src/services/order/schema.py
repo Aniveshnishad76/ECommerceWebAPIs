@@ -1,6 +1,5 @@
 """order items schema file"""
 
-from src.config.db_constants import DBTables, DBConfig
 from sqlalchemy import Column, TIMESTAMP
 from sqlalchemy.dialects.postgresql import (
     BIGINT,
@@ -8,6 +7,7 @@ from sqlalchemy.dialects.postgresql import (
     SMALLINT,
     DOUBLE_PRECISION
 )
+from src.config.db_constants import DBTables, DBConfig
 from src.db.session import Base
 
 

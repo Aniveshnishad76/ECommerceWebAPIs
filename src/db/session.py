@@ -8,12 +8,8 @@ from src.config.env import get_settings
 config = get_settings()
 
 engine = create_engine(
-    "postgresql://{user}:{password}@{host}/{db_name}".format(
-        user=config.db_app.db_username,
-        password=config.db_app.db_password,
-        host=config.db_app.db_host,
-        db_name=config.db_app.db_name,
-    ),
+    f"postgresql://{config.db_app.db_username}:"
+    f"{config.db_app.db_password}@{config.db_app.db_host}/{config.db_app.db_name}"
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=True, bind=engine)

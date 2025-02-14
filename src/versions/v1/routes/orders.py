@@ -15,7 +15,7 @@ order_get                       = sentry_wrapper("Order - get")
 
 @router.post("/", tags=["Orders POST"], dependencies=[Depends(order_post)])
 @Auth.authenticate_user
-async def save(request: Request, payload: OrderInbound):
+async def save(payload: OrderInbound):
 
     """route for fetch category"""
 
@@ -24,7 +24,7 @@ async def save(request: Request, payload: OrderInbound):
 
 @router.patch("/", tags=["Orders PATCH"], dependencies=[Depends(order_update)])
 @Auth.authenticate_user
-async def update(request: Request, payload: UpdateOrderInbound):
+async def update(payload: UpdateOrderInbound):
 
     """route for fetch category"""
 
@@ -32,7 +32,7 @@ async def update(request: Request, payload: UpdateOrderInbound):
 
 @router.get("/", tags=["Orders GET"], dependencies=[Depends(order_get)])
 @Auth.authenticate_user
-async def get(request: Request, _id: int = None):
+async def get(_id: int = None):
 
     """route for fetch orders"""
 
@@ -40,7 +40,7 @@ async def get(request: Request, _id: int = None):
 
 @router.delete("/", tags=["Orders DELETE"], dependencies=[Depends(order_delete)])
 @Auth.authenticate_user
-async def delete(request: Request, _id: int):
+async def delete(_id: int):
 
     """route for fetch orders"""
 

@@ -1,6 +1,6 @@
 """Celery task"""
-from celery import Celery
 import logging
+from celery import Celery
 from src.config.env import get_settings
 
 broker_config = get_settings()

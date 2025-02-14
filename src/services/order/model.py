@@ -32,7 +32,8 @@ class OrderModel:
         return cls.get(_id=_id)
 
     @classmethod
-    def get(cls, _id: int = None, ids: List[int] = None, status: List[int] = None, user_id: int = None, page: int = 1, size: int = 10):
+    def get(cls, _id: int = None, ids: List[int] = None, status: List[int] = None,
+            user_id: int = None, page: int = 1, size: int = 10):
         """method to get orders"""
         offset = (page - 1) * size
         rows = db.query(OrderSchema)
