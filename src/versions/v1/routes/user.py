@@ -21,12 +21,12 @@ user_logout                     = sentry_wrapper("User - logout")
 
 
 @router.post("/login", tags=["User POST"], dependencies=[Depends(user_login)])
-async def login(payload: UserLoginInbound):
+async def login(request: Request, payload: UserLoginInbound):
     """login route"""
     return await UserController.login(payload=payload)
 
 @router.post("/register", tags=["User POST"], dependencies=[Depends(user_register)])
-async def register(payload: UserRegisterInbound):
+async def register(request: Request, payload: UserRegisterInbound):
     """login route"""
     return await UserController.register(payload=payload)
 
