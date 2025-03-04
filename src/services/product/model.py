@@ -62,7 +62,7 @@ class ProductModel:
             rows = rows.filter(ProductSchema.id.in_(ids))
         if category_id:
             rows = rows.filter(ProductSchema.category_id == category_id)
-        rows = rows.offset(offset).limit(size)
+        rows = rows.order_by(ProductSchema.id.desc()).offset(offset).limit(size)
         if not _id:
             rows = select_all(rows)
         else:

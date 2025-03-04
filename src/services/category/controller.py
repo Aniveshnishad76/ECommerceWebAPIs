@@ -14,11 +14,14 @@ class CategoryController:
     @classmethod
     async def create_category(cls, payload: CategoryAddInBound):
         """category create function"""
-        if payload.name:
-            data = CategoryModel.get(name=payload.name)
-            if data:
-                return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_ALREADY_EXISTS.format("Category"))))
-        category = CategoryModel.create(**payload.__dict__)
+        data = CategoryModel.get(name=payload.name, status=CategoriesStatusConstant.Active)
+        if data:
+            return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_ALREADY_EXISTS.format("Category"))))
+        data = CategoryModel.get(name=payload.name, status=CategoriesStatusConstant.Inactive)
+        if data and data[0]:
+            category = CategoryModel.patch(_id=data[0].id, **{"status": CategoriesStatusConstant.Active})
+        else:
+            category = CategoryModel.create(**payload.__dict__)
         data = CategoryAddOutBound(**category.__dict__)
         response = JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.CREATED_SUCCESSFULLY, data=data.__dict__)))
         return response
@@ -27,7 +30,7 @@ class CategoryController:
     async def get_category(cls, _id: int = None, page: int = 1, size: int = 10):
         """category get by id function"""
 
-        data = CategoryModel.get(_id=_id, page=page, size=size)
+        data = CategoryModel.get(_id=_id, status=CategoriesStatusConstant.Active, page=page, size=size)
         if not data:
             return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)))
         if _id:
@@ -41,7 +44,7 @@ class CategoryController:
     async def delete_category(cls, _id: int):
         """category delete function"""
 
-        category = CategoryModel.get(_id=_id)
+        category = CategoryModel.get(_id=_id, status=CategoriesStatusConstant.Active)
         if not category:
             return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)))
         CategoryModel.patch(_id=_id, **{"status": CategoriesStatusConstant.Inactive})
@@ -53,7 +56,7 @@ class CategoryController:
         if not payload.name and not payload.description:
             return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.MISSING_FILED_TO_UPDATE)))
         payload_dict = payload.dict(exclude_unset=True, exclude_none=True)
-        category = CategoryModel.get(_id=payload.id)
+        category = CategoryModel.get(_id=payload.id, status=CategoriesStatusConstant.Active)
         if not category:
             return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_NOT_FOUND)))
 

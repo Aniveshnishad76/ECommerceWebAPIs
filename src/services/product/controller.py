@@ -3,7 +3,7 @@ from typing import List
 from fastapi.responses import JSONResponse
 from fastapi import status, UploadFile, File
 from fastapi.encoders import jsonable_encoder
-from src.config.constants import ProductStatusConstant, S3Constants
+from src.config.constants import ProductStatusConstant, S3Constants, CategoriesStatusConstant
 from src.config.error_constants import ErrorMessage
 from src.lib.s3 import Boto
 from src.services.category.model import CategoryModel
@@ -35,6 +35,7 @@ class ProductController:
                     name=data.category_name,
                     description=data.category_description
                 ),
+                image_urls=data.image_urls.get("urls") if data.image_urls else [],
             )
             return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(data=result.__dict__)))
         else:
@@ -51,6 +52,7 @@ class ProductController:
                         name=product.category_name,
                         description=product.category_description
                     ),
+                    image_urls=product.image_urls.get("urls") if product.image_urls else [],
                 )
                 response.append(result.__dict__)
             return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(data=response)))
@@ -61,7 +63,7 @@ class ProductController:
 
         category = None
         if payload.category_id:
-            category = CategoryModel.get(_id=payload.category_id)
+            category = CategoryModel.get(_id=payload.category_id, status=CategoriesStatusConstant.Active)
             if not category:
                 return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.INVALID_ID.format("category"))))
         if category:
@@ -74,8 +76,11 @@ class ProductController:
         image_url_list = []
         for file in image:
             attachment_name, attachment_format = generate_attachment_name_and_format(file)
-            path = f"{S3Constants.Product_Image}/{attachment_name}.{attachment_format}"
-            image_url = await boto_client.upload_to_s3(attachment=file, path=path)
+            path = f"{S3Constants.Product_Image}/{attachment_name}{attachment_format}"
+            try:
+                image_url = await boto_client.upload_to_s3(attachment=file, path=path)
+            except:
+                return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.CUSTOM_MESSAGE.format("File Does not exist or has been corrupted"))))
             image_url_list.append(image_url)
 
         payload = payload.__dict__
@@ -97,7 +102,7 @@ class ProductController:
         """product update function"""
         category = None
         if payload.category_id:
-            category = CategoryModel.get(_id=payload.category_id)
+            category = CategoryModel.get(_id=payload.category_id, status=CategoriesStatusConstant.Active)
             if not category:
                 return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.INVALID_ID.format("category"))))
         product = ProductModel.get(_id=payload.id)

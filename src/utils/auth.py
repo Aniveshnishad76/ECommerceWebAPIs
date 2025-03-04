@@ -56,9 +56,12 @@ class Auth:
                 exp_token = await redis_cache.get(key=RedisKey.USER_EXPIRE_SESSION_TOKEN.format(token=token))
                 if exp_token:
                     return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=jsonable_encoder(UnauthenticatedException(message=ErrorMessage.INVALID_TOKEN)))
+                try:
+                    email = decode_jwt_token(token)["email"]
+                    email = email.lower()
+                except Exception as e:
+                    return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content=jsonable_encoder(UnauthenticatedException(message=ErrorMessage.INVALID_TOKEN)))
 
-                email = decode_jwt_token(token)["email"]
-                email = email.lower()
             else:
                 email = config.default_email
 
@@ -111,8 +114,11 @@ class Auth:
                 exp_token = await redis_cache.get(key=RedisKey.USER_EXPIRE_SESSION_TOKEN.format(token=token))
                 if exp_token:
                     return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content=jsonable_encoder(UnauthenticatedException(message=ErrorMessage.INVALID_TOKEN)))
-                email = decode_jwt_token(token)["email"]
-                email = email.lower()
+                try:
+                    email = decode_jwt_token(token)["email"]
+                    email = email.lower()
+                except Exception as e:
+                    return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content=jsonable_encoder(UnauthenticatedException(message=ErrorMessage.INVALID_TOKEN)))
             else:
                 email = config.default_email
             user_details = await UserController.get_user_by_email(email=email)

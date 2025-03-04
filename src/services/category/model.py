@@ -28,20 +28,24 @@ class CategoryModel:
             setattr(obj, key, value)
         obj.updated_at = datetime.now()
         update_old_row(obj)
-        return cls.get(_id=_id)
+        return cls.get(_id=_id, status=CategoriesStatusConstant.Active)
 
     @classmethod
-    def get(cls, _id: int = None, ids: List[int] = None, name: str = None, page: int = 1, size: int = 10):
+    def get(cls, _id: int = None, ids: List[int] = None, name: str = None, page: int = 1, size: int = 10, status: int = CategoriesStatusConstant.Active):
         """method to get category by id"""
         offset = (page - 1) * size
-        rows = db.query(CategorySchema).filter(CategorySchema.status == CategoriesStatusConstant.Active)
+        rows = db.query(CategorySchema)
+
+        if status:
+            rows = rows.filter(CategorySchema.status == status)
         if _id:
             rows = rows.filter(CategorySchema.id == _id)
         if ids:
             rows = rows.filter(CategorySchema.id.in_(ids))
         if name:
             rows = rows.filter(CategorySchema.name == name)
-        rows = rows.offset(offset).limit(size)
+
+        rows = rows.order_by(CategorySchema.id.desc()).offset(offset).limit(size)
         if not _id:
             rows = select_all(rows)
         else:
