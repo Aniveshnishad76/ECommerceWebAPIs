@@ -44,6 +44,8 @@ class OrderItemsModel:
             rows = rows.filter(OrderItemSchema.id.in_(status))
         if order_id:
             rows = rows.filter(OrderItemSchema.order_id == order_id)
+
+        rows = rows.order_by(OrderItemSchema.id.desc())
         if not _id:
             rows = select_all(rows)
         else:
