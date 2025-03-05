@@ -30,7 +30,7 @@ class UserController:
         if not verify_password(password=payload.password, hashed_password=user.password_hash):
             return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST,content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.PASSWORD_DO_NOT_MATCH)))
         token = generate_jwt_token(email=payload.email)
-        data = UserLoginOutBound(username=user.username, email=user.email, token=token)
+        data = UserLoginOutBound(username=user.username, email=user.email, token=token, is_admin=user.is_admin)
         data = CommonMessageOutbound(data=data.__dict__)
         return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(data))
 

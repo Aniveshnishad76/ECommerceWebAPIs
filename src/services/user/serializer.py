@@ -29,6 +29,7 @@ class UserLoginOutBound(BaseModel):
     username: str
     email: str
     token: str
+    is_admin: bool = False
 
 
 class UserRegisterInbound(BaseModel):
