@@ -48,6 +48,7 @@ class UserModel:
             rows = rows.filter(UserSchema.is_admin == is_admin)
         if user_name:
             rows = rows.filter(UserSchema.username == user_name)
+        rows = rows.order_by(UserSchema.id.desc())
         if not _id and not email:
             rows = select_all(rows)
         else:

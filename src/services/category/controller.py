@@ -18,7 +18,7 @@ class CategoryController:
         if data:
             return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.RECORD_ALREADY_EXISTS.format("Category"))))
         data = CategoryModel.get(name=payload.name, status=CategoriesStatusConstant.Inactive)
-        if data and data[0]:
+        if data and len(data) >= 1:
             category = CategoryModel.patch(_id=data[0].id, **{"status": CategoriesStatusConstant.Active})
         else:
             category = CategoryModel.create(**payload.__dict__)

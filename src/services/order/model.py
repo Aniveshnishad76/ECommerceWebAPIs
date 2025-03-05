@@ -45,7 +45,7 @@ class OrderModel:
             rows = rows.filter(OrderSchema.id.in_(ids))
         if user_id:
             rows = rows.filter(OrderSchema.user_id == user_id)
-        rows = rows.offset(offset).limit(size)
+        rows = rows.order_by(OrderSchema.id.desc()).offset(offset).limit(size)
         if not _id:
             rows = select_all(rows)
         else:

@@ -134,6 +134,20 @@ class ReviewModel(Base):
     status                    = Column(SMALLINT, nullable=False, default=1)
 
 
+class CartSchema(Base):
+    """Cart Model"""
+
+    __tablename__  = DBTables.CARTS
+    __table_args__ = DBConfig.BASE_ARGS
+
+    id                        = Column(BIGINT, primary_key=True)
+    product_id                = Column(BIGINT, default=0)
+    user_id                   = Column(BIGINT, default=0)
+    quantity                  = Column(SMALLINT, nullable=False)
+    meta_data                 = Column(JSONB, default=lambda: {})
+    created_at                = Column(TIMESTAMP)
+    updated_at                = Column(TIMESTAMP)
+
 
 # Indexing
 Index(DBTables.USER + '_username_key', UserModel.username, unique=False)
@@ -148,3 +162,5 @@ Index(DBTables.ORDER_ITEMS + '_product_id_key', OrderItemModel.product_id, uniqu
 Index(DBTables.PAYMENTS + '_order_id_key', PaymentModel.order_id, unique=False)
 Index(DBTables.REVIEWS + '_product_id_key', ReviewModel.product_id, unique=False)
 Index(DBTables.REVIEWS + '_user_id_key', ReviewModel.user_id, unique=False)
+Index(DBTables.CARTS + '_user_id_key', ReviewModel.user_id, unique=False)
+Index(DBTables.CARTS + '_product_id_key', ReviewModel.product_id, unique=False)
