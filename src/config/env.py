@@ -1,7 +1,11 @@
 """file to contain the env specific configs"""
 import os
+from fastapi import status
 from functools import lru_cache
 from pydantic_settings import BaseSettings
+from src.config.aws_secret_manager import get_secret
+
+secret_manager = get_secret()
 
 
 class DBConfig:
@@ -18,11 +22,16 @@ class AppDBConfig(DBConfig):
     """
     App Db config
     """
-
-    db_host: str = os.getenv("DB_HOST", "localhost:5432")
-    db_name: str = os.getenv("DB_NAME", "app-web")
-    db_username: str = os.getenv("DB_USERNAME", "postgres")
-    db_password: str = os.getenv("DB_PASSWORD", "root")
+    if secret_manager and not secret_manager.data:
+        db_host: str = secret_manager.data.get("DB_HOST")
+        db_name: str = secret_manager.data.get("DB_NAME")
+        db_username: str = secret_manager.data.get("DB_USERNAME")
+        db_password: str = secret_manager.data.get("DB_PASSWORD")
+    else:
+        db_host: str = os.getenv("DB_HOST", "localhost:5432")
+        db_name: str = os.getenv("DB_NAME", "app-web")
+        db_username: str = os.getenv("DB_USERNAME", "postgres")
+        db_password: str = os.getenv("DB_PASSWORD", "root")
 
 
 class BaseConfig(BaseSettings):
