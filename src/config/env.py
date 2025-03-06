@@ -22,11 +22,11 @@ class AppDBConfig(DBConfig):
     """
     App Db config
     """
-    if secret_manager and not secret_manager.data:
-        db_host: str = secret_manager.data.get("DB_HOST")
-        db_name: str = secret_manager.data.get("DB_NAME")
-        db_username: str = secret_manager.data.get("DB_USERNAME")
-        db_password: str = secret_manager.data.get("DB_PASSWORD")
+    if secret_manager:
+        db_host: str = secret_manager.get("DB_HOST")
+        db_name: str = secret_manager.get("DB_NAME")
+        db_username: str = secret_manager.get("DB_USERNAME")
+        db_password: str = secret_manager.get("DB_PASSWORD")
     else:
         db_host: str = os.getenv("DB_HOST", "localhost:5432")
         db_name: str = os.getenv("DB_NAME", "app-web")

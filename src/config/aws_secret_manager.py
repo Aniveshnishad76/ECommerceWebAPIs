@@ -13,9 +13,9 @@ def get_secret():
     """aws secret manager"""
     try:
         client = boto3.client(service_name='secretsmanager', region_name='us-east-2')
-        get_secret_value_response = client.get_secret_value(SecretId="")
+        get_secret_value_response = client.get_secret_value(SecretId="EcommerceApp")
         secret = get_secret_value_response['SecretString']
         secret = json.loads(secret)
-        return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder(CommonMessageOutbound(data=secret)))
+        return secret
     except Exception as e:
-        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content=jsonable_encoder(CommonMessageOutbound(message=ErrorMessage.CUSTOM_MESSAGE.format(str(e)))))
+        return
