@@ -42,8 +42,8 @@ class ProductModel(Base):
     __table_args__ = DBConfig.BASE_ARGS
 
     id                        = Column(BIGINT, primary_key=True)
-    name                      = Column(VARCHAR(100), nullable=False)
-    description               = Column(VARCHAR(255))
+    name                      = Column(VARCHAR(400), nullable=False)
+    description               = Column(VARCHAR(600))
     price                     = Column(DOUBLE_PRECISION, nullable=False)
     stock                     = Column(BIGINT, default=0)
     category_id               = Column(BIGINT, default=0)
@@ -62,7 +62,7 @@ class CategoryModel(Base):
 
     id                        = Column(BIGINT, primary_key=True)
     name                      = Column(VARCHAR(100), nullable=False, unique=True)
-    description               = Column(VARCHAR(255))
+    description               = Column(VARCHAR(600))
     meta_data                 = Column(JSONB, default=lambda: {})
     created_at                = Column(TIMESTAMP)
     updated_at                = Column(TIMESTAMP)
